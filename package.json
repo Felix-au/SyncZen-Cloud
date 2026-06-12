@@ -1,0 +1,40 @@
+{
+  "name": "syncstay-web",
+  "version": "1.0.0",
+  "description": "SyncStay Web — Cloud hotel check-in platform",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:ci": "jest --ci --coverage"
+  },
+  "dependencies": {
+    "next": "^14.2.29",
+    "next-auth": "^5.0.0-beta.28",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "mongoose": "^8.15.0",
+    "googleapis": "^148.0.0",
+    "bcryptjs": "^2.4.3",
+    "nanoid": "^5.1.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.x",
+    "@types/react": "^18.x",
+    "@types/react-dom": "^18.x",
+    "@types/jest": "^29.x",
+    "@testing-library/react": "^14.x",
+    "@testing-library/jest-dom": "^6.x",
+    "jest": "^29.x",
+    "jest-environment-jsdom": "^29.x",
+    "ts-jest": "^29.x",
+    "eslint": "^8.x",
+    "eslint-config-next": "^14.x",
+    "typescript": "^5.x"
+  }
+}
