@@ -1,0 +1,135 @@
+# ================================================================
+# SyncStay Web — .gitignore
+# ================================================================
+# This is the root gitignore for the Hotel Sync Cloud workspace.
+# It covers:
+#   - The Next.js web app (files at this root)
+#   - The Hotel-Check-In sub-project (desktop + mobile)
+#   - Credentials, secrets, and OS artifacts
+# ================================================================
+
+
+# ── 1. CREDENTIALS & SECRETS ─────────────────────────────────
+# Google Service Account JSON key — NEVER commit private keys
+*.json
+!package.json
+!package-lock.json
+!tsconfig*.json
+!jest.config.json
+!.eslintrc.json
+
+# Environment variable files — contain DB URIs, API secrets
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
+
+
+# ── 2. NEXT.JS WEB APP ───────────────────────────────────────
+# Next.js build output
+.next/
+out/
+
+# Next.js cache
+.next/cache/
+
+# Vercel deployment
+.vercel/
+
+# Build artifacts
+build/
+dist/
+
+
+# ── 3. NODE / NPM ────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+.pnpm-store/
+
+# Optional: lock files (keep package-lock.json for reproducibility)
+# yarn.lock
+# pnpm-lock.yaml
+
+
+# ── 4. TESTING ───────────────────────────────────────────────
+# Jest coverage reports
+coverage/
+.nyc_output/
+
+
+# ── 5. TYPESCRIPT ────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+
+# ── 6. HOTEL-CHECK-IN SUB-PROJECT ────────────────────────────
+# Desktop (Electron) build outputs
+Hotel-Check-In/desktop/node_modules/
+Hotel-Check-In/desktop/dist/
+Hotel-Check-In/desktop/out/
+Hotel-Check-In/desktop/build/
+
+# Mobile (Expo / React Native)
+Hotel-Check-In/mobile/node_modules/
+Hotel-Check-In/mobile/.expo/
+Hotel-Check-In/mobile/android/
+Hotel-Check-In/mobile/ios/
+
+# Scratch / temp files (agent workspace)
+Hotel-Check-In/scratch/
+
+# SQLite databases (desktop local DB)
+Hotel-Check-In/**/*.db
+Hotel-Check-In/**/*.sqlite
+
+# Compiled binaries
+Hotel-Check-In/**/*.exe
+Hotel-Check-In/**/*.msi
+Hotel-Check-In/**/*.apk
+
+# Agent rules file (internal tooling)
+Hotel-Check-In/.agentrules
+
+
+# ── 7. OS ARTIFACTS ──────────────────────────────────────────
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+
+# ── 8. IDE & EDITOR ──────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+
+
+# ── 9. LOGS & MISC ───────────────────────────────────────────
+*.log
+logs/
+.turbo/
+.cache/
