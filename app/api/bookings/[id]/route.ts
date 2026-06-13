@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import Booking from '@/lib/models/Booking'
-import Room from '@/lib/models/Room'
 import { auth } from '@/lib/auth'
-import { canCheckIn } from '@/lib/roles'
+import { canCheckIn, isSuperAdmin } from '@/lib/roles'
 
 type Params = { params: { id: string } }
 
-/** GET /api/bookings/[id] — Full booking detail including guests and rooms */
+/**
+ * GET /api/bookings/[id]
+ * Full booking detail including populated rooms and creator.
+ * super_admin can access any booking regardless of hotel.
+ */
 export async function GET(_req: NextRequest, { params }: Params) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -15,14 +18,20 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
   await connectDB()
 
-  const booking = await Booking.findOne({
-    _id: params.id,
-    hotelId: session.user.hotelId,
-  })
+  const filter: Record<string, unknown> = { _id: params.id }
+  // Scope to hotel unless super_admin
+  if (!isSuperAdmin(session.user.role as any)) {
+    filter.hotelId = session.user.hotelId
+  }
+
+  const booking = await Booking.findOne(filter)
     .populate('roomIds', 'roomNumber roomType floor pricePerNight')
     .populate('createdBy', 'name email')
-    .lean()
+    .lean() as any
 
   if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
-  return NextResponse.json({ booking })
+
+  // Rename roomIds -> rooms so the client doesn't need to know the internal field name
+  const { roomIds, ...rest } = booking
+  return NextResponse.json({ booking: { ...rest, rooms: roomIds ?? [] } })
 }
