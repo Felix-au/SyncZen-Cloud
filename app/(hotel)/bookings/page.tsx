@@ -42,6 +42,7 @@ export default function BookingsPage() {
     setLoading(false)
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [])
 
   function handleSearch(e: React.FormEvent) {

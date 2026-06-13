@@ -89,7 +89,7 @@ export default function EmployeesPage() {
         <div className="glass-card empty-state">
           <span className="empty-icon">👥</span>
           <div className="empty-title">No employees yet</div>
-          <div className="empty-text">Add employees by email or share your hotel's invite key so they can self-register.</div>
+          <div className="empty-text">Add employees by email or share your hotel&apos;s invite key so they can self-register.</div>
         </div>
       ) : (
         <div className="glass-card">
