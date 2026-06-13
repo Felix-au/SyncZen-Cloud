@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { PhotoUpload } from '@/components/PhotoUpload'
 
 interface Hotel {
@@ -10,8 +11,9 @@ interface Hotel {
 }
 
 export default function SettingsPage() {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
   const role = session?.user?.role
+  const router = useRouter()
 
   const [hotel, setHotel]     = useState<Hotel | null>(null)
   const [loading, setLoading] = useState(true)
@@ -107,7 +109,12 @@ export default function SettingsPage() {
     const data = await res.json()
     setCreating(false)
     if (!res.ok) { setCreateError(data.error ?? 'Failed to create hotel'); return }
-    loadHotel()
+
+    // Refresh the JWT so session.user.hotelId and role reflect the new hotel_owner status,
+    // then bust the RSC cache and navigate to the dashboard.
+    await update()
+    router.refresh()
+    router.push('/dashboard')
   }
 
   if (loading) return <div className="page-container flex justify-center" style={{ paddingTop: 80 }}><span className="spinner spinner-lg" /></div>
