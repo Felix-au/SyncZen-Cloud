@@ -25,4 +25,5 @@ export const { auth } = NextAuth({
   },
   session: { strategy: 'jwt' },
   secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true,
 })
