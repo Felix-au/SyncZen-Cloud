@@ -65,13 +65,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     /**
      * jwt — persists extra fields into the token so they're available
      * on every request without hitting the DB.
+     *
+     * On trigger='update' (called by useSession update()) we re-read the
+     * user from the DB so that changes like hotelId / role promotion are
+     * reflected in the token without requiring a full sign-out/sign-in.
      */
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
+        // Initial sign-in — populate token from the credentials authorize() return value
         token.id      = user.id
         token.role    = (user as any).role
         token.hotelId = (user as any).hotelId
       }
+
+      if (trigger === 'update' && token.id) {
+        // Session refresh requested (e.g. after hotel creation) — sync from DB
+        const { connectDB }     = await import('@/lib/mongodb')
+        const { default: User } = await import('@/lib/models/User')
+        await connectDB()
+        const fresh = await User.findById(token.id).select('role hotelId').lean() as any
+        if (fresh) {
+          token.role    = fresh.role
+          token.hotelId = fresh.hotelId?.toString() ?? null
+        }
+      }
+
       return token
     },
 
