@@ -343,10 +343,11 @@ body {
 
 .stat-card:hover::before { opacity: 0.1; }
 
-.stat-card.blue::before  { background: var(--accent); }
-.stat-card.green::before { background: var(--green); }
-.stat-card.amber::before { background: var(--amber); }
-.stat-card.red::before   { background: var(--red); }
+.stat-card.blue::before   { background: var(--accent); }
+.stat-card.green::before  { background: var(--green); }
+.stat-card.amber::before  { background: var(--amber); }
+.stat-card.red::before    { background: var(--red); }
+.stat-card.purple::before { background: var(--purple); }
 
 .stat-label {
   font-size: var(--fs-xs);
