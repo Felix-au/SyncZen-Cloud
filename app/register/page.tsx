@@ -9,7 +9,7 @@ import Image from 'next/image'
 export default function RegisterPage() {
   const router = useRouter()
   const [form, setForm] = useState({ name: '', username: '', email: '', password: '', confirm: '' })
-  const [error, setError]   = useState('')
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   function update(field: string, value: string) {
@@ -97,9 +97,6 @@ export default function RegisterPage() {
               value={form.username} onChange={e => update('username', e.target.value)}
               required autoComplete="username"
               pattern="[a-zA-Z0-9_]{3,20}" title="3–20 characters: letters, numbers, underscores" />
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', marginTop: 2 }}>
-              Used to sign in — letters, numbers and underscores only
-            </span>
           </div>
 
           <div className="input-group">
