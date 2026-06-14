@@ -63,22 +63,35 @@ export async function POST(req: NextRequest) {
   }
 
   const passwordHash = await bcrypt.hash(password, 12)
-  const user = await User.create({
-    name: name.trim(),
-    username: cleanUsername,
-    email: email.toLowerCase().trim(),
-    passwordHash,
-    role,
-    hotelId: session.user.hotelId,
-  })
+  try {
+    const user = await User.create({
+      name: name.trim(),
+      username: cleanUsername,
+      email: email.toLowerCase().trim(),
+      passwordHash,
+      role,
+      hotelId: session.user.hotelId,
+    })
 
-  return NextResponse.json({
-    employee: {
-      _id: user._id,
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      role: user.role,
+    return NextResponse.json({
+      employee: {
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      }
+    }, { status: 201 })
+  } catch (err: any) {
+    console.error('[employees/create]', err?.message ?? err)
+    if (err?.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map((e: any) => e.message).join(', ')
+      return NextResponse.json({ error: messages }, { status: 400 })
     }
-  }, { status: 201 })
+    if (err?.code === 11000) {
+      const field = Object.keys(err.keyPattern ?? {})[0] ?? 'field'
+      return NextResponse.json({ error: `That ${field} is already taken` }, { status: 409 })
+    }
+    return NextResponse.json({ error: 'Failed to create employee' }, { status: 500 })
+  }
 }

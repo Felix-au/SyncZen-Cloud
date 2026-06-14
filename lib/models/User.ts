@@ -33,11 +33,10 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, required: true, trim: true },
     username: {
       type: String,
-      required: true,
       unique: true,
+      sparse: true,   // Only index docs that actually have a username (legacy docs won't collide)
       lowercase: true,
       trim: true,
-      index: true,
     },
     role: {
       type: String,
