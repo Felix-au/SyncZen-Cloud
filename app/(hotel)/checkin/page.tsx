@@ -301,6 +301,7 @@ export default function CheckInPage() {
                       <option value="Leisure">Leisure</option>
                       <option value="Business">Business</option>
                       <option value="Personal">Personal</option>
+                      <option value="Darshan">Darshan</option>
                       <option value="Other">Other</option>
                     </select>
                   </div>

@@ -8,17 +8,23 @@ import { logActivity } from '@/lib/activityLogger'
 
 type Params = { params: Promise<{ id: string }> }
 
-/** PATCH /api/rooms/[id] — Edit room details or status (manager+) */
+/** PATCH /api/rooms/[id] — Edit room details or status (staff can edit status, manager+ can edit all) */
 export async function PATCH(req: NextRequest, { params }: Params) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  if (!canManageRooms(session.user.role as any)) {
-    return NextResponse.json({ error: 'Forbidden — manager role required' }, { status: 403 })
+  
+  const isManager = canManageRooms(session.user.role as any)
+  const isStaff = session.user.role === 'staff'
+
+  if (!isManager && !isStaff) {
+    return NextResponse.json({ error: 'Forbidden — staff or manager role required' }, { status: 403 })
   }
 
   try {
     const body = await req.json()
-    const allowed = ['roomNumber', 'roomType', 'floor', 'pricePerNight', 'notes', 'status']
+    const allowed = isManager
+      ? ['roomNumber', 'roomType', 'floor', 'pricePerNight', 'notes', 'status']
+      : ['status']
 
     await connectDB()
     const { id } = await params

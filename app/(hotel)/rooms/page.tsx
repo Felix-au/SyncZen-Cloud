@@ -35,6 +35,7 @@ export default function RoomsPage() {
   const { data: session } = useSession()
   const role = session?.user?.role as string
   const canManage = canManageRooms(role as any)
+  const canChangeStatus = role === 'staff' || canManage
 
   const [rooms, setRooms]     = useState<Room[]>([])
   const [filter, setFilter]   = useState<Status>('all')
@@ -161,16 +162,26 @@ export default function RoomsPage() {
               )}
               {room.notes && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', marginTop: 'var(--sp-xs)' }}>{room.notes}</div>}
 
-              {canManage && (
+              {(canManage || canChangeStatus) && (
                 <div className="flex gap-xs mt-md flex-wrap">
-                  <button className="btn btn-ghost btn-sm flex-1" onClick={() => openEdit(room)}>Edit</button>
-                  {room.status !== 'maintenance' && (
-                    <button className="btn btn-ghost btn-sm flex-1" onClick={() => handleStatusChange(room, 'maintenance')}>🔧</button>
+                  {canManage && (
+                    <button className="btn btn-ghost btn-sm flex-1" onClick={() => openEdit(room)}>Edit</button>
                   )}
-                  {room.status === 'maintenance' && (
-                    <button className="btn btn-ghost btn-sm flex-1" onClick={() => handleStatusChange(room, 'available')}>✓ Fix</button>
+                  {canChangeStatus && (
+                    <>
+                      {room.status !== 'maintenance' && (
+                        <button className="btn btn-ghost btn-sm flex-1" onClick={() => handleStatusChange(room, 'maintenance')} title="Mark under maintenance">🔧</button>
+                      )}
+                      {(room.status === 'maintenance' || room.status === 'checkout') && (
+                        <button className="btn btn-ghost btn-sm flex-1" onClick={() => handleStatusChange(room, 'available')} title="Mark as available">
+                          {room.status === 'checkout' ? '✓ Clean' : '✓ Fix'}
+                        </button>
+                      )}
+                    </>
                   )}
-                  <button className="btn btn-danger btn-sm btn-icon" onClick={() => handleDelete(room)}>🗑</button>
+                  {canManage && (
+                    <button className="btn btn-danger btn-sm btn-icon" onClick={() => handleDelete(room)}>🗑</button>
+                  )}
                 </div>
               )}
             </div>

@@ -185,7 +185,6 @@ export default function BookingsPage() {
             <table>
               <thead>
                 <tr>
-                  <th>Ref</th>
                   <th>Primary Guest</th>
                   <th>Room(s)</th>
                   <th>Check-In Date</th>
@@ -193,6 +192,7 @@ export default function BookingsPage() {
                   <th>Nights</th>
                   <th>Status</th>
                   <th>Actions</th>
+                  <th>Ref</th>
                 </tr>
               </thead>
               <tbody>
@@ -200,10 +200,7 @@ export default function BookingsPage() {
                   const primary = b.guests.find(g => g.isPrimary) ?? b.guests[0]
                   const rooms = (b.roomIds as any[]).map(r => r.roomNumber ?? r).join(', ')
                   return (
-                    <tr key={b._id}>
-                      <td style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--accent)' }}>
-                        {b.bookingReference}
-                      </td>
+                    <tr key={b._id} onClick={() => router.push(`/bookings/${b._id}`)}>
                       <td style={{ fontWeight: 600, color: 'var(--text-pri)' }}>{primary?.name}</td>
                       <td>{rooms}</td>
                       <td style={{ fontSize: 'var(--fs-xs)' }}>{new Date(b.checkInTime).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}</td>
@@ -212,11 +209,14 @@ export default function BookingsPage() {
                       <td><span className={`badge ${STATUS_CLASS[b.status] ?? 'badge-muted'}`}>{b.status.replace('_', ' ')}</span></td>
                       <td>
                         <div className="flex gap-xs">
-                          <button className="btn btn-ghost btn-sm" onClick={() => router.push(`/bookings/${b._id}`)}>View</button>
+                          <button className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); router.push(`/bookings/${b._id}`); }}>View</button>
                           {b.status === 'checked_in' && (
-                            <button className="btn btn-ghost btn-sm" onClick={() => handleCheckoutTrigger(b)}>Check Out</button>
+                            <button className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); handleCheckoutTrigger(b); }}>Check Out</button>
                           )}
                         </div>
+                      </td>
+                      <td style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--accent)' }}>
+                        {b.bookingReference}
                       </td>
                     </tr>
                   )
