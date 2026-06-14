@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/mongodb'
 import User from '@/lib/models/User'
 import { auth } from '@/lib/auth'
 import { canManageEmployees, canManageManagers } from '@/lib/roles'
+import { logActivity } from '@/lib/activityLogger'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -42,8 +43,16 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Cannot change the hotel owner\'s role' }, { status: 403 })
   }
 
+  const oldRole = target.role
   target.role = role
   await target.save()
+
+  await logActivity(
+    session.user.id,
+    session.user.hotelId!,
+    'employee_update',
+    `Updated employee ${target.name} (${target.username}) role from ${oldRole} to ${role}.`
+  )
 
   return NextResponse.json({
     employee: { _id: target._id, name: target.name, email: target.email, role: target.role }
@@ -75,6 +84,13 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   target.hotelId = null
   target.role = 'staff'
   await target.save()
+
+  await logActivity(
+    session.user.id,
+    session.user.hotelId!,
+    'employee_delete',
+    `Removed employee ${target.name} (${target.username}) from hotel.`
+  )
 
   return NextResponse.json({ message: `${target.name} removed from hotel` })
 }

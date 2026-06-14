@@ -36,7 +36,7 @@ export default auth((req: any) => {
   }
 
   // Protected hotel app routes
-  const protectedPrefixes = ['/dashboard', '/rooms', '/checkin', '/bookings', '/employees', '/settings']
+  const protectedPrefixes = ['/dashboard', '/rooms', '/checkin', '/bookings', '/employees', '/settings', '/logs']
   const isProtected = protectedPrefixes.some(p => pathname.startsWith(p))
 
   if (isProtected && !isAuthed) {
@@ -64,6 +64,7 @@ export const config = {
     '/bookings/:path*',
     '/employees/:path*',
     '/settings/:path*',
+    '/logs/:path*',
     '/super/:path*',
     '/login',
     '/register',

@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/mongodb'
 import User from '@/lib/models/User'
 import { auth } from '@/lib/auth'
 import { canManageEmployees } from '@/lib/roles'
+import { logActivity } from '@/lib/activityLogger'
 
 /**
  * POST /api/employees/create
@@ -72,6 +73,13 @@ export async function POST(req: NextRequest) {
       role,
       hotelId: session.user.hotelId,
     })
+
+    await logActivity(
+      session.user.id,
+      session.user.hotelId!,
+      'employee_create',
+      `Added new employee: ${user.name} (${user.username}, Role: ${user.role})`
+    )
 
     return NextResponse.json({
       employee: {

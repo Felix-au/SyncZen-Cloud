@@ -5,6 +5,7 @@ import Room from '@/lib/models/Room'
 import '@/lib/models/User'   // ensure User schema is registered for .populate('createdBy')
 import { auth } from '@/lib/auth'
 import { canCheckIn } from '@/lib/roles'
+import { logActivity } from '@/lib/activityLogger'
 
 /** Generates a booking reference like "SS1A2B3C" */
 function genRef(): string {
@@ -176,6 +177,14 @@ export async function POST(req: NextRequest) {
     await Room.updateMany(
       { _id: { $in: roomIds } },
       { status: 'occupied', updatedAt: new Date() }
+    )
+
+    // Log activity
+    await logActivity(
+      session.user.id,
+      session.user.hotelId!,
+      'booking_create',
+      `Created booking ${bookingReference} for room(s): ${rooms.map(r => r.roomNumber).join(', ')} (Nights: ${nights}, Guests: ${totalGuests ?? 1})`
     )
 
     return NextResponse.json({ booking, bookingReference }, { status: 201 })

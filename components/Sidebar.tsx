@@ -20,6 +20,7 @@ const HOTEL_NAV: NavItem[] = [
   { href: '/bookings',   label: 'Bookings',    icon: '📋' },
   { href: '/employees',  label: 'Employees',   icon: '👥', roles: ['hotel_owner','manager'] },
   { href: '/settings',   label: 'Settings',    icon: '⚙️',  roles: ['hotel_owner'] },
+  { href: '/logs',       label: 'Activity Logs', icon: '📜', roles: ['hotel_owner'] },
 ]
 
 const SUPER_NAV: NavItem[] = [

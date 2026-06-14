@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/mongodb'
 import Room from '@/lib/models/Room'
 import { auth } from '@/lib/auth'
 import { canCheckIn, canManageRooms, belongsToHotel } from '@/lib/roles'
+import { logActivity } from '@/lib/activityLogger'
 
 /**
  * GET /api/rooms?status=available
@@ -58,6 +59,13 @@ export async function POST(req: NextRequest) {
       notes: notes?.trim() ?? '',
       status: 'available',
     })
+
+    await logActivity(
+      session.user.id,
+      session.user.hotelId!,
+      'room_create',
+      `Added new room: Room ${room.roomNumber} (${room.roomType}, Floor: ${room.floor})`
+    )
 
     return NextResponse.json({ room }, { status: 201 })
   } catch (err: any) {

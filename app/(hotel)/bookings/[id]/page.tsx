@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { Modal } from '@/components/Modal'
 
 interface Guest {
   name: string
@@ -59,19 +60,107 @@ export default function BookingDetailPage() {
   const [loading, setLoading] = useState(true)
   const [checking, setChecking] = useState(false)
 
+  // Checkout date inline edit state
+  const [isEditingDate, setIsEditingDate] = useState(false)
+  const [tempDate, setTempDate] = useState('')
+  const [savingDate, setSavingDate] = useState(false)
+
+  // Checkout flow state
+  const [showDateMismatchModal, setShowDateMismatchModal] = useState(false)
+  const [showCheckoutOptionsModal, setShowCheckoutOptionsModal] = useState(false)
+
   useEffect(() => {
     fetch(`/api/bookings/${id}`)
       .then(r => r.json())
       .then(d => { setBooking(d.booking ?? null); setLoading(false) })
   }, [id])
 
-  async function handleCheckout() {
-    if (!confirm('Confirm check-out for this booking?')) return
+  async function triggerCheckoutFlow() {
+    if (!booking) return
+    
+    // Check if scheduled check-out date is today (calendar dates comparison)
+    const todayLocal = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
+    const bookingCheckoutLocal = new Date(booking.checkOutDate).toLocaleDateString('en-CA')
+
+    if (todayLocal !== bookingCheckoutLocal) {
+      setShowDateMismatchModal(true)
+    } else {
+      setShowCheckoutOptionsModal(true)
+    }
+  }
+
+  async function handleUpdateCheckoutToToday() {
+    if (!booking) return
+    const todayLocal = new Date().toLocaleDateString('en-CA')
     setChecking(true)
-    const res = await fetch(`/api/bookings/${id}/checkout`, { method: 'POST' })
-    setChecking(false)
-    if (res.ok) {
-      setBooking(prev => prev ? { ...prev, status: 'checked_out' } : null)
+    
+    try {
+      const res = await fetch(`/api/bookings/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ checkOutDate: todayLocal })
+      })
+      const data = res.ok ? await res.json() : null
+      
+      if (res.ok && data?.booking) {
+        setBooking(data.booking)
+        setShowDateMismatchModal(false)
+        setShowCheckoutOptionsModal(true)
+      } else {
+        alert(data?.error ?? 'Failed to update checkout date to today.')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Error updating checkout date.')
+    } finally {
+      setChecking(false)
+    }
+  }
+
+  async function handleCheckoutConfirm(action: 'serviced' | 'maintenance') {
+    setChecking(true)
+    try {
+      const res = await fetch(`/api/bookings/${id}/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      })
+      if (res.ok) {
+        setBooking(prev => prev ? { ...prev, status: 'checked_out' } : null)
+        setShowCheckoutOptionsModal(false)
+      } else {
+        const data = await res.json()
+        alert(data?.error ?? 'Checkout failed')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Checkout error')
+    } finally {
+      setChecking(false)
+    }
+  }
+
+  async function handleSaveDate() {
+    if (!tempDate) return
+    setSavingDate(true)
+    try {
+      const res = await fetch(`/api/bookings/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ checkOutDate: tempDate })
+      })
+      const data = res.ok ? await res.json() : null
+      if (res.ok && data?.booking) {
+        setBooking(data.booking)
+        setIsEditingDate(false)
+      } else {
+        alert(data?.error ?? 'Failed to update check-out date.')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Error saving check-out date.')
+    } finally {
+      setSavingDate(false)
     }
   }
 
@@ -122,7 +211,7 @@ export default function BookingDetailPage() {
           </p>
         </div>
         {booking.status === 'checked_in' && (
-          <button className="btn btn-danger" onClick={handleCheckout} disabled={checking}>
+          <button className="btn btn-danger" onClick={triggerCheckoutFlow} disabled={checking}>
             {checking ? <span className="spinner" /> : '🔑'}
             {checking ? 'Processing…' : 'Check Out Now'}
           </button>
@@ -148,14 +237,19 @@ export default function BookingDetailPage() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 'var(--sp-md)',
-                    padding: 'var(--sp-sm) var(--sp-md)',
-                    background: g.isPrimary ? 'var(--accent-dim)' : 'var(--glass-bg)',
+                    padding: 'var(--sp-sm)',
                     borderRadius: 'var(--r-md)',
-                    border: `1px solid ${g.isPrimary ? 'rgba(59,130,246,0.2)' : 'var(--border)'}`,
+                    background: g.isPrimary ? 'var(--accent-dim)' : 'none',
+                    border: g.isPrimary ? '1px solid rgba(59,130,246,0.15)' : '1px solid transparent',
                   }}
                 >
                   {g.photoUrl ? (
-                    <img src={g.photoUrl} alt={g.name} className="guest-avatar" />
+                    <img
+                      src={g.photoUrl}
+                      alt={g.name}
+                      className="guest-avatar"
+                      style={{ objectFit: 'cover' }}
+                    />
                   ) : (
                     <div
                       className="guest-avatar"
@@ -239,7 +333,43 @@ export default function BookingDetailPage() {
             <div style={{ padding: 'var(--sp-md) var(--sp-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-sm)' }}>
               {[
                 ['Check-in',      new Date(booking.checkInTime).toLocaleString()],
-                ['Check-out',     new Date(booking.checkOutDate).toLocaleDateString()],
+                ['Check-out',     (
+                  isEditingDate ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={e => e.stopPropagation()}>
+                      <input
+                        type="date"
+                        className="input"
+                        style={{ padding: '4px 8px', fontSize: 13, width: 140, height: 32, margin: 0 }}
+                        value={tempDate}
+                        min={new Date(booking.checkInTime).toLocaleDateString('en-CA')}
+                        onChange={e => setTempDate(e.target.value)}
+                      />
+                      <button className="btn btn-primary btn-sm" onClick={handleSaveDate} disabled={savingDate} style={{ padding: '4px 10px', height: 32 }}>
+                        {savingDate ? '…' : 'Save'}
+                      </button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setIsEditingDate(false)} style={{ padding: '4px 10px', height: 32 }}>
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span>{new Date(booking.checkOutDate).toLocaleDateString()}</span>
+                      {booking.status === 'checked_in' && (
+                        <button
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, padding: '4px 8px', borderRadius: 4 }}
+                          onClick={() => {
+                            setTempDate(new Date(booking.checkOutDate).toLocaleDateString('en-CA'))
+                            setIsEditingDate(true)
+                          }}
+                          className="btn-ghost"
+                          title="Edit check-out date"
+                        >
+                          ✏️
+                        </button>
+                      )}
+                    </div>
+                  )
+                )],
                 ['Nights',        booking.nights],
                 ['Charge / night', booking.customChargePerNight
                   ? `₹${booking.customChargePerNight.toLocaleString()} (custom)`
@@ -257,7 +387,7 @@ export default function BookingDetailPage() {
               ].map(([label, value]) => (
                 <div key={label as string} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBlock: 6, borderBottom: '1px solid var(--border)' }}>
                   <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)' }}>{label}</span>
-                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'var(--text-pri)' }}>{value}</span>
+                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'var(--text-pri)', display: 'flex', alignItems: 'center' }}>{value}</span>
                 </div>
               ))}
             </div>
@@ -329,6 +459,119 @@ export default function BookingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Date Mismatch Warning Modal */}
+      <Modal
+        open={showDateMismatchModal}
+        onClose={() => setShowDateMismatchModal(false)}
+        title="Check-Out Date Mismatch"
+        footer={
+          <>
+            <button className="btn btn-ghost" onClick={() => setShowDateMismatchModal(false)}>Cancel</button>
+            <button className="btn btn-ghost text-amber" onClick={() => { setShowDateMismatchModal(false); setShowCheckoutOptionsModal(true) }}>
+              Keep Scheduled &amp; Proceed
+            </button>
+            <button className="btn btn-primary" onClick={handleUpdateCheckoutToToday} disabled={checking}>
+              {checking ? <span className="spinner" /> : null}
+              Update to Today &amp; Proceed
+            </button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 40, textAlign: 'center' }}>⚠️</div>
+          <p style={{ fontSize: 'var(--fs-md)', color: 'var(--text-pri)', textAlign: 'center', fontWeight: 600 }}>
+            Check-out date mismatch detected!
+          </p>
+          <div style={{ background: 'var(--elevated)', padding: 'var(--sp-md)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ color: 'var(--text-mute)' }}>Scheduled Check-Out:</span>
+              <span style={{ fontWeight: 700, color: 'var(--text-pri)' }}>
+                {booking ? new Date(booking.checkOutDate).toLocaleDateString() : ''}
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--text-mute)' }}>Today's Date:</span>
+              <span style={{ fontWeight: 700, color: 'var(--accent)' }}>
+                {new Date().toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+          <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', textAlign: 'center' }}>
+            It is recommended to align the check-out date to today so that guest stay nights are accurately calculated and logged in the system.
+          </p>
+        </div>
+      </Modal>
+
+      {/* Checkout Options Modal */}
+      <Modal
+        open={showCheckoutOptionsModal}
+        onClose={() => setShowCheckoutOptionsModal(false)}
+        title="Choose Check-Out Status"
+        footer={
+          <>
+            <button className="btn btn-ghost" onClick={() => setShowCheckoutOptionsModal(false)}>Cancel</button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={{ fontSize: 'var(--fs-md)', color: 'var(--text-pri)', textAlign: 'center' }}>
+            Please select how the rooms should be marked upon check-out:
+          </p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div 
+              onClick={() => { if (!checking) handleCheckoutConfirm('serviced') }}
+              style={{
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-md)',
+                padding: 'var(--sp-md)',
+                cursor: checking ? 'not-allowed' : 'pointer',
+                background: 'var(--elevated)',
+                transition: 'border-color var(--t-fast), transform var(--t-fast)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                gap: 8
+              }}
+              onMouseEnter={e => { if (!checking) e.currentTarget.style.borderColor = 'var(--accent)' }}
+              onMouseLeave={e => { if (!checking) e.currentTarget.style.borderColor = 'var(--border)' }}
+            >
+              <span style={{ fontSize: 28 }}>🧹</span>
+              <div style={{ fontWeight: 700, color: 'var(--text-pri)' }}>Check Out &amp; Service</div>
+              <p style={{ fontSize: 11, color: 'var(--text-mute)', margin: 0 }}>
+                Rooms are cleaned and marked <strong>Available</strong> for immediate check-in.
+              </p>
+            </div>
+
+            <div 
+              onClick={() => { if (!checking) handleCheckoutConfirm('maintenance') }}
+              style={{
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-md)',
+                padding: 'var(--sp-md)',
+                cursor: checking ? 'not-allowed' : 'pointer',
+                background: 'var(--elevated)',
+                transition: 'border-color var(--t-fast), transform var(--t-fast)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                gap: 8
+              }}
+              onMouseEnter={e => { if (!checking) e.currentTarget.style.borderColor = 'var(--amber)' }}
+              onMouseLeave={e => { if (!checking) e.currentTarget.style.borderColor = 'var(--border)' }}
+            >
+              <span style={{ fontSize: 28 }}>🔧</span>
+              <div style={{ fontWeight: 700, color: 'var(--text-pri)' }}>Check Out Only</div>
+              <p style={{ fontSize: 11, color: 'var(--text-mute)', margin: 0 }}>
+                Rooms are marked <strong>Under Maintenance</strong> for deep cleaning or repairs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
