@@ -27,6 +27,12 @@ export default auth((req: any) => {
   const isAuthed     = !!session?.user
   const role: string = session?.user?.role ?? ''
 
+  // Handle root path redirect
+  if (pathname === '/') {
+    const dest = isAuthed ? (role === 'super_admin' ? '/super/dashboard' : '/dashboard') : '/login'
+    return NextResponse.redirect(new URL(dest, req.url))
+  }
+
   // Auth-only routes (redirect away when already logged in)
   const isAuthRoute = pathname === '/login' || pathname === '/register' || pathname === '/join'
 
@@ -58,6 +64,7 @@ export default auth((req: any) => {
 export const config = {
   // Only run on paths that need protection. Exclude API routes and static files.
   matcher: [
+    '/',
     '/dashboard/:path*',
     '/rooms/:path*',
     '/checkin/:path*',

@@ -36,7 +36,7 @@ interface Booking {
   idProofFileIds?: string[]
   idProofUrls?: string[]
   createdBy: { name: string; email: string }
-  hotelId: string
+  hotelId: string | { _id: string; name: string }
   address?: string
   nationality: string
   totalGuests: number
@@ -178,6 +178,10 @@ export default function BookingDetailPage() {
       return
     }
 
+    const hotelName = typeof booking.hotelId === 'object' && booking.hotelId && 'name' in booking.hotelId
+      ? (booking.hotelId as any).name
+      : 'SyncZen Cloud'
+
     const guestsListHtml = booking.guests.map((g, i) => `
       <div class="guest-card" style="display: flex; gap: 20px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 15px; page-break-inside: avoid; background-color: #f9fafb;">
         ${g.photoUrl ? `<img src="${g.photoUrl}" alt="${g.name}" style="width: 90px; height: 90px; object-fit: cover; border-radius: 6px; border: 1px solid #d1d5db;" />` : '<div style="width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 40px; background-color: #e5e7eb; border-radius: 6px; border: 1px solid #d1d5db; color: #9ca3af;">👤</div>'}
@@ -198,6 +202,26 @@ export default function BookingDetailPage() {
       <div style="font-size: 14px; margin-bottom: 4px; font-weight: bold; color: #1f2937;">Room ${r.roomNumber} (${r.roomType} · Floor ${r.floor})</div>
     `).join('')
 
+    const idProofUrls = booking.idProofUrls && booking.idProofUrls.length > 0
+      ? booking.idProofUrls
+      : (booking.idProofUrl ? [booking.idProofUrl] : [])
+
+    const idDocsHtml = idProofUrls.length > 0
+      ? `
+        <div class="section" style="page-break-inside: avoid;">
+          <div class="section-title">ID Document Proofs</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+            ${idProofUrls.map((url, idx) => `
+              <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; text-align: center; background-color: #f9fafb; page-break-inside: avoid;">
+                <img src="${url}" alt="ID Document Proof ${idx + 1}" style="max-width: 100%; max-height: 220px; object-fit: contain; border-radius: 6px; border: 1px solid #e5e7eb;" />
+                <div style="font-size: 12px; color: #6b7280; margin-top: 6px; font-weight: 600;">Document Proof ${idx + 1}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `
+      : ''
+
     const checkoutDateStr = new Date(booking.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'long' })
     const checkinDateStr = new Date(booking.checkInTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'long', timeStyle: 'short' })
 
@@ -209,9 +233,21 @@ export default function BookingDetailPage() {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Booking_${booking.bookingReference}</title>
+          <title>${hotelName} - Booking_${booking.bookingReference}</title>
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1f2937; margin: 40px; line-height: 1.5; }
+            @media print {
+              @page {
+                size: auto;
+                margin: 0mm;
+              }
+              body {
+                margin: 15mm 20mm;
+              }
+              .print-footer {
+                display: block !important;
+              }
+            }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1f2937; margin: 40px; line-height: 1.5; padding-bottom: 60px; }
             .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #3b82f6; padding-bottom: 15px; margin-bottom: 30px; }
             .header-title h1 { margin: 0; font-size: 28px; color: #1e3a8a; font-weight: 800; }
             .header-title p { margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }
@@ -229,16 +265,24 @@ export default function BookingDetailPage() {
             
             .notes-box { border-left: 4px solid #3b82f6; background-color: #eff6ff; padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 14px; color: #1e3a8a; font-style: italic; }
             
-            @media print {
-              body { margin: 20px; }
-              .no-print { display: none; }
+            .print-footer {
+              position: fixed;
+              bottom: 10mm;
+              left: 20mm;
+              right: 20mm;
+              text-align: center;
+              font-size: 12px;
+              color: #9ca3af;
+              border-top: 1px solid #e5e7eb;
+              padding-top: 8px;
+              display: none;
             }
           </style>
         </head>
         <body>
           <div class="header">
             <div class="header-title">
-              <h1>SyncZen Cloud</h1>
+              <h1>${hotelName}</h1>
               <p>Booking details & guest invoice</p>
             </div>
             <div class="ref-box">
@@ -274,9 +318,15 @@ export default function BookingDetailPage() {
             </div>
           ` : ''}
 
+          ${idDocsHtml}
+
           <div class="section">
             <div class="section-title">Guests Details</div>
             ${guestsListHtml}
+          </div>
+
+          <div class="print-footer">
+            Powered by SyncZen Cloud
           </div>
 
           <script>

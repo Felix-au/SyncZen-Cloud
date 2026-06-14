@@ -1,6 +1,16 @@
-import { redirect } from 'next/navigation'
+'use client'
 
-/** Root route — redirect to dashboard (middleware will redirect to /login if not authed) */
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+/** Root route fallback client-side redirect */
 export default function HomePage() {
-  redirect('/dashboard')
+  const router = useRouter()
+
+  useEffect(() => {
+    router.replace('/dashboard')
+  }, [router])
+
+  return null
 }
+

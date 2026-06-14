@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import Booking from '@/lib/models/Booking'
 import '@/lib/models/User'   // register User schema for .populate('createdBy')
+import '@/lib/models/Hotel'  // register Hotel schema for .populate('hotelId')
 import { auth } from '@/lib/auth'
 import { canCheckIn, isSuperAdmin } from '@/lib/roles'
 import { logActivity } from '@/lib/activityLogger'
@@ -30,6 +31,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const booking = await Booking.findOne(filter)
     .populate('roomIds', 'roomNumber roomType floor pricePerNight')
     .populate('createdBy', 'name email')
+    .populate('hotelId', 'name')
     .lean() as any
 
   if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
@@ -64,6 +66,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     const booking = await Booking.findOne(filter)
       .populate('roomIds', 'roomNumber roomType floor pricePerNight')
+      .populate('hotelId', 'name')
 
     if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
     if (booking.status !== 'checked_in') {
