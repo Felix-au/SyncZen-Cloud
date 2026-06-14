@@ -1328,6 +1328,8 @@ tbody tr:last-child td {
     transition: transform var(--t-base);
     box-shadow: none;
     z-index: 300;
+    height: 100dvh;
+    overflow-y: auto;
   }
 
   .sidebar.open {
@@ -1338,6 +1340,9 @@ tbody tr:last-child td {
   /* Show close button inside sidebar on mobile */
   .sidebar-close-btn {
     display: inline-flex;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
   }
 
   /* Backdrop */
@@ -1387,8 +1392,8 @@ tbody tr:last-child td {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     border-radius: var(--r-sm);
     color: var(--text-pri);
     background: transparent;
@@ -1407,15 +1412,20 @@ tbody tr:last-child td {
   }
 
   .grid-4 {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .grid-3 {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .grid-2 {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Prevent automatic iOS input zoom by forcing font size to 16px */
+  .input, select.input, textarea.input {
+    font-size: 16px !important;
   }
 
   /* ── Check-in wizard mobile ──────────────────────────────── */
