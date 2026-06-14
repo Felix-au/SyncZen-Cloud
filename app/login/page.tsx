@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export default function LoginPage() {
   const router = useRouter()
+  const params  = useSearchParams()
+  const hint    = params.get('hint')
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
@@ -46,6 +48,19 @@ export default function LoginPage() {
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
+          {hint && (
+            <div style={{
+              background: 'var(--green-dim)',
+              border: '1px solid rgba(34,197,94,0.25)',
+              borderRadius: 'var(--r-md)',
+              padding: '10px 14px',
+              fontSize: 'var(--fs-sm)',
+              color: 'var(--green)',
+              marginBottom: 'var(--sp-sm)',
+            }}>
+              ✓ {hint}
+            </div>
+          )}
           {error && (
             <div style={{
               background: 'var(--red-dim)',

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { PhotoUpload } from '@/components/PhotoUpload'
 
 interface Hotel {
@@ -108,11 +108,19 @@ export default function SettingsPage() {
     setCreating(false)
     if (!res.ok) { setCreateError(data.error ?? 'Failed to create hotel'); return }
 
-    // Refresh the JWT so session.user.hotelId and role reflect the new hotel_owner status.
-    // Use a hard navigation (not router.push) so the browser does a full reload and picks
-    // up the new session cookie — client-side navigation keeps the stale session in memory.
-    await update()
-    window.location.href = '/dashboard'
+    // update() re-runs the jwt callback with trigger:'update' so the token picks up the
+    // new hotelId and role written to DB by the hotel creation API.
+    // Passing a payload is required in some next-auth v5 beta versions to trigger the callback.
+    const refreshed = await update({ _refresh: true })
+
+    if (refreshed?.user?.hotelId) {
+      // Session updated successfully — hard reload so the new cookie is read from scratch
+      window.location.href = '/dashboard'
+    } else {
+      // update() didn't propagate — sign out so the user re-authenticates with a fresh token
+      await signOut({ redirect: false })
+      window.location.href = '/login?hint=Hotel+created!+Sign+in+to+continue.'
+    }
   }
 
   if (loading) return <div className="page-container flex justify-center" style={{ paddingTop: 80 }}><span className="spinner spinner-lg" /></div>
