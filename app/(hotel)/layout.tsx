@@ -25,7 +25,7 @@ export default function HotelLayout({ children }: { children: React.ReactNode })
             <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
-        <span className="mobile-topbar-title">SyncZen Cloud</span>
+        <span className="mobile-topbar-title">SyncZen</span>
         <div style={{ width: 36 }} /> {/* spacer to centre title */}
       </header>
 

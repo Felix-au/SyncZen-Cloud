@@ -1,16 +1,18 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTheme } from '@/components/ThemeProvider'
 
 export default function RegisterPage() {
   const router = useRouter()
   const [form, setForm] = useState({ name: '', username: '', email: '', password: '', confirm: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const { theme, toggle } = useTheme()
 
   function update(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -25,28 +27,32 @@ export default function RegisterPage() {
       return
     }
 
-    if (form.password.length < 8) {
-      setError('Password must be at least 8 characters')
+    if (form.password.length < 4) {
+      setError('Password must be at least 4 characters')
       return
     }
 
     setLoading(true)
-
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: form.name, username: form.username, email: form.email, password: form.password }),
+      body: JSON.stringify({
+        name: form.name.trim(),
+        username: form.username.trim(),
+        email: form.email.trim(),
+        password: form.password,
+      }),
     })
 
-    const data = await res.json()
     if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setError(data.error || 'Failed to register account')
       setLoading(false)
-      setError(data.error || 'Registration failed')
       return
     }
 
-    // Auto sign-in after successful registration
-    const signInRes = await signIn('credentials', {
+    // Sign in automatically
+    const signRes = await signIn('credentials', {
       email: form.email,
       password: form.password,
       redirect: false,
@@ -54,9 +60,8 @@ export default function RegisterPage() {
 
     setLoading(false)
 
-    if (signInRes?.error) {
-      setError('Account created but auto-sign-in failed. Please log in manually.')
-      router.push('/login')
+    if (signRes?.error) {
+      setError('Registration successful! Please login manually.')
       return
     }
 
@@ -68,10 +73,38 @@ export default function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="glass-card auth-card">
+        {/* Theme Toggle */}
+        <button
+          onClick={toggle}
+          className="icon-btn"
+          style={{ position: 'absolute', top: 'var(--sp-lg)', right: 'var(--sp-lg)' }}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          aria-label="Toggle theme"
+          type="button"
+        >
+          {theme === 'dark' ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          )}
+        </button>
+
         <div className="auth-logo">
-          <Image src="/logo.png" alt="SyncZen Cloud" width={52} height={52} style={{ borderRadius: 12, objectFit: 'contain', marginBottom: 8 }} />
+          <Image src="/logo.png" alt="SyncZen" width={52} height={52} style={{ borderRadius: 12, objectFit: 'contain', marginBottom: 8 }} />
           <div className="auth-title">Create account</div>
-          <div className="auth-subtitle">Join SyncZen Cloud — register your hotel or join a team</div>
+          <div className="auth-subtitle">Join SyncZen — register your hotel or join a team</div>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>

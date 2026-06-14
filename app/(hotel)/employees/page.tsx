@@ -146,7 +146,7 @@ export default function EmployeesPage() {
         <div className="glass-card empty-state">
           <span className="empty-icon">👥</span>
           <div className="empty-title">No employees yet</div>
-          <div className="empty-text">Create accounts for your team or add existing SyncZen Cloud users.</div>
+          <div className="empty-text">Create accounts for your team or add existing SyncZen users.</div>
         </div>
       ) : (
         <div className="glass-card">
@@ -237,7 +237,7 @@ export default function EmployeesPage() {
         {mode === 'create' && (
           <>
             <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', margin: 0 }}>
-              Creates a new SyncZen Cloud account and immediately assigns them to your hotel.
+              Creates a new SyncZen account and immediately assigns them to your hotel.
               Password minimum is <strong>4 characters</strong> — suitable for shared devices.
             </p>
 
@@ -338,7 +338,7 @@ export default function EmployeesPage() {
         {mode === 'existing' && (
           <>
             <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', margin: 0 }}>
-              The employee must already have a registered SyncZen Cloud account.
+              The employee must already have a registered SyncZen account.
             </p>
             <div className="input-group">
               <label className="input-label" htmlFor="emp-email">Email address</label>

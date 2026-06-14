@@ -16,9 +16,9 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: { default: 'SyncZen Cloud', template: '%s | SyncZen Cloud' },
+  title: { default: 'SyncZen', template: '%s | SyncZen' },
   description: 'Cloud hotel check-in and management platform — register hotels, manage rooms, and process guest check-ins from anywhere.',
-  keywords: ['hotel management', 'check-in', 'hotel software', 'SyncZen Cloud'],
+  keywords: ['hotel management', 'check-in', 'hotel software', 'SyncZen'],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

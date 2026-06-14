@@ -81,9 +81,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
     <aside className={`sidebar ${open ? 'open' : ''}`}>
       {/* Brand */}
       <div className="sidebar-brand">
-        <Image src="/logo.png" alt="SyncZen Cloud" width={36} height={36} style={{ borderRadius: 8, objectFit: 'contain' }} />
+        <Image src="/logo.png" alt="SyncZen" width={36} height={36} style={{ borderRadius: 8, objectFit: 'contain' }} />
         <div>
-          <div className="sidebar-name">SyncZen Cloud</div>
+          <div className="sidebar-name">SyncZen</div>
           <div className="sidebar-tag">{isSuper ? 'Super Admin' : 'Hotel Cloud'}</div>
         </div>
 
