@@ -257,6 +257,17 @@ export default function BookingDetailPage() {
               }
             }
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1f2937; margin: 40px; line-height: 1.5; padding-bottom: 60px; }
+            
+            table.print-layout {
+              width: 100%;
+              border-collapse: collapse;
+              border: none;
+            }
+            table.print-layout td {
+              padding: 0;
+              border: none;
+            }
+            
             .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #3b82f6; padding-bottom: 15px; margin-bottom: 30px; }
             .header-title h1 { margin: 0; font-size: 28px; color: #1e3a8a; font-weight: 800; }
             .header-title p { margin: 5px 0 0 0; color: #6b7280; font-size: 14px; }
@@ -289,53 +300,66 @@ export default function BookingDetailPage() {
           </style>
         </head>
         <body>
-          <div class="header">
-            <div class="header-title">
-              <h1>${hotelName}</h1>
-              <p>Booking details & guest invoice</p>
-            </div>
-            <div class="ref-box">
-              <div class="ref-title">Booking Reference</div>
-              <div class="ref-val">${booking.bookingReference}</div>
-            </div>
-          </div>
+          <table class="print-layout">
+            <thead>
+              <tr>
+                <td>
+                  <div class="header">
+                    <div class="header-title">
+                      <h1>${hotelName}</h1>
+                      <p>Booking details & guest invoice</p>
+                    </div>
+                    <div class="ref-box">
+                      <div class="ref-title">Booking Reference</div>
+                      <div class="ref-val">${booking.bookingReference}</div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="section">
+                    <div class="section-title">General Details</div>
+                    <div class="grid">
+                      <div class="field"><span class="label">Check-in Time</span><span class="val">${checkinDateStr}</span></div>
+                      <div class="field"><span class="label">Check-out Date</span><span class="val">${checkoutDateStr}</span></div>
+                      ${checkoutTimeStr ? `<div class="field"><span class="label">Actual Check-out</span><span class="val">${checkoutTimeStr}</span></div>` : ''}
+                      <div class="field"><span class="label">Nights</span><span class="val">${booking.nights}</span></div>
+                      <div class="field"><span class="label">Payment Mode</span><span class="val">${booking.paymentMode?.toUpperCase()}</span></div>
+                      <div class="field"><span class="label">Charge per Night</span><span class="val">₹${chargePerNight.toLocaleString()}</span></div>
+                      <div class="field"><span class="label">Total Booking Amount</span><span class="val">₹${totalAmount.toLocaleString()}</span></div>
+                      <div class="field"><span class="label">Nationality</span><span class="val">${booking.nationality}</span></div>
+                      <div class="field"><span class="label">Purpose of Travel</span><span class="val">${booking.purposeOfTravel || '—'}</span></div>
+                      <div class="field"><span class="label">ID Document Number</span><span class="val">${booking.idProofNumber || '—'}</span></div>
+                      <div class="field"><span class="label">Status</span><span class="val" style="text-transform: uppercase;">${booking.status.replace('_', ' ')}</span></div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                      <div style="font-size: 14px; color: #6b7280; font-weight: 600; margin-bottom: 6px;">Rooms:</div>
+                      ${roomsListHtml}
+                    </div>
+                  </div>
 
-          <div class="section">
-            <div class="section-title">General Details</div>
-            <div class="grid">
-              <div class="field"><span class="label">Check-in Time</span><span class="val">${checkinDateStr}</span></div>
-              <div class="field"><span class="label">Check-out Date</span><span class="val">${checkoutDateStr}</span></div>
-              ${checkoutTimeStr ? `<div class="field"><span class="label">Actual Check-out</span><span class="val">${checkoutTimeStr}</span></div>` : ''}
-              <div class="field"><span class="label">Nights</span><span class="val">${booking.nights}</span></div>
-              <div class="field"><span class="label">Payment Mode</span><span class="val">${booking.paymentMode?.toUpperCase()}</span></div>
-              <div class="field"><span class="label">Charge per Night</span><span class="val">₹${chargePerNight.toLocaleString()}</span></div>
-              <div class="field"><span class="label">Total Booking Amount</span><span class="val">₹${totalAmount.toLocaleString()}</span></div>
-              <div class="field"><span class="label">Nationality</span><span class="val">${booking.nationality}</span></div>
-              <div class="field"><span class="label">Purpose of Travel</span><span class="val">${booking.purposeOfTravel || '—'}</span></div>
-              <div class="field"><span class="label">ID Document Number</span><span class="val">${booking.idProofNumber || '—'}</span></div>
-              <div class="field"><span class="label">Status</span><span class="val" style="text-transform: uppercase;">${booking.status.replace('_', ' ')}</span></div>
-            </div>
-            <div style="margin-top: 15px;">
-              <div style="font-size: 14px; color: #6b7280; font-weight: 600; margin-bottom: 6px;">Rooms:</div>
-              ${roomsListHtml}
-            </div>
-          </div>
+                  ${booking.notes ? `
+                    <div class="section">
+                      <div class="section-title">Staff Notes</div>
+                      <div class="notes-box">${booking.notes}</div>
+                    </div>
+                  ` : ''}
 
-          ${booking.notes ? `
-            <div class="section">
-              <div class="section-title">Staff Notes</div>
-              <div class="notes-box">${booking.notes}</div>
-            </div>
-          ` : ''}
+                  ${idDocsHtml}
 
-          ${idDocsHtml}
-
-          <div class="section" style="text-align: center;">
-            <div class="section-title" style="text-align: center;">Guests Details</div>
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
-              ${guestsListHtml}
-            </div>
-          </div>
+                  <div class="section" style="text-align: center; page-break-before: always; break-before: page;">
+                    <div class="section-title" style="text-align: center;">Guests Details</div>
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+                      ${guestsListHtml}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
           <div class="print-footer">
             Powered by SyncZen Cloud
