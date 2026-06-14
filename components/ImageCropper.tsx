@@ -2,6 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
+import 'react-image-crop/dist/ReactCrop.css'
 
 interface ImageCropperProps {
   imageSrc: string
@@ -10,192 +12,97 @@ interface ImageCropperProps {
   onCancel: () => void
 }
 
-interface CropArea {
-  x: number
-  y: number
-  w: number
-  h: number
-}
-
-interface RenderedSize {
-  width: number
-  height: number
+function centerAspectCrop(
+  mediaWidth: number,
+  mediaHeight: number,
+  aspect: number,
+) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: '%',
+        width: 100,
+      },
+      aspect,
+      mediaWidth,
+      mediaHeight,
+    ),
+    mediaWidth,
+    mediaHeight,
+  )
 }
 
 export function ImageCropper({ imageSrc, aspectRatio, onCrop, onCancel }: ImageCropperProps) {
   const [mounted, setMounted] = useState(false)
-  const [crop, setCrop] = useState<CropArea | null>(null)
-  const [renderedSize, setRenderedSize] = useState<RenderedSize | null>(null)
-  const [activeAction, setActiveAction] = useState<string | null>(null)
-  const [pointerStart, setPointerStart] = useState<{ x: number; y: number } | null>(null)
+  const [crop, setCrop] = useState<Crop>()
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null)
+  const imageRef = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
     setMounted(true)
   }, [])
-  const [cropStart, setCropStart] = useState<CropArea | null>(null)
 
-  const imageRef = useRef<HTMLImageElement>(null)
-
-  // Recalculate crop bounds on image load
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget
-    const width = img.width
-    const height = img.height
-    setRenderedSize({ width, height })
-
-    let initialX = 0
-    let initialY = 0
-    let initialW = width
-    let initialH = height
+    const { width, height } = img
 
     if (aspectRatio) {
-      const size = Math.min(width, height)
-      initialW = size
-      initialH = size
-      initialX = (width - size) / 2
-      initialY = (height - size) / 2
-    }
-
-    setCrop({
-      x: initialX,
-      y: initialY,
-      w: initialW,
-      h: initialH,
-    })
-  }
-
-  // Pointer event handlers for unified mouse and touch drag/resize
-  const handlePointerDown = (action: string, e: React.PointerEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!crop) return
-
-    e.currentTarget.setPointerCapture(e.pointerId)
-    setPointerStart({ x: e.clientX, y: e.clientY })
-    setCropStart({ ...crop })
-    setActiveAction(action)
-  }
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!activeAction || !pointerStart || !cropStart || !renderedSize || !crop) return
-    e.preventDefault()
-    e.stopPropagation()
-
-    const dx = e.clientX - pointerStart.x
-    const dy = e.clientY - pointerStart.y
-
-    const imgW = renderedSize.width
-    const imgH = renderedSize.height
-
-    let { x, y, w, h } = cropStart
-    const minSize = 40
-
-    if (activeAction === 'move') {
-      let newX = Math.max(0, Math.min(imgW - w, x + dx))
-      let newY = Math.max(0, Math.min(imgH - h, y + dy))
-      setCrop({ x: newX, y: newY, w, h })
+      const initial = centerAspectCrop(width, height, aspectRatio)
+      setCrop(initial)
+      
+      const pixelWidth = (initial.width / 100) * img.naturalWidth
+      const pixelHeight = (initial.height / 100) * img.naturalHeight
+      const pixelX = (initial.x / 100) * img.naturalWidth
+      const pixelY = (initial.y / 100) * img.naturalHeight
+      setCompletedCrop({
+        unit: 'px',
+        x: pixelX,
+        y: pixelY,
+        width: pixelWidth,
+        height: pixelHeight
+      })
     } else {
-      let newX = x
-      let newY = y
-      let newW = w
-      let newH = h
-
-      if (aspectRatio) {
-        // Enforce 1:1 Aspect Ratio (Square)
-        if (activeAction === 'resize-br') {
-          const delta = Math.max(dx, dy)
-          const size = Math.max(minSize, Math.min(imgW - x, imgH - y, w + delta))
-          newW = size
-          newH = size
-        } else if (activeAction === 'resize-bl') {
-          const delta = Math.max(-dx, dy)
-          const size = Math.max(minSize, Math.min(x + w, imgH - y, w + delta))
-          newX = x + w - size
-          newW = size
-          newH = size
-        } else if (activeAction === 'resize-tr') {
-          const delta = Math.max(dx, -dy)
-          const size = Math.max(minSize, Math.min(imgW - x, y + h, w + delta))
-          newY = y + h - size
-          newW = size
-          newH = size
-        } else if (activeAction === 'resize-tl') {
-          const delta = Math.max(-dx, -dy)
-          const size = Math.max(minSize, Math.min(x + w, y + h, w + delta))
-          newX = x + w - size
-          newY = y + h - size
-          newW = size
-          newH = size
-        }
-      } else {
-        // Free Aspect Ratio
-        if (activeAction.includes('r')) {
-          newW = Math.max(minSize, Math.min(imgW - x, w + dx))
-        }
-        if (activeAction.includes('b')) {
-          newH = Math.max(minSize, Math.min(imgH - y, h + dy))
-        }
-        if (activeAction.includes('l')) {
-          const maxLeftW = x + w
-          const potentialW = w - dx
-          if (potentialW >= minSize) {
-            newX = Math.max(0, x + dx)
-            newW = maxLeftW - newX
-          } else {
-            newX = x + w - minSize
-            newW = minSize
-          }
-        }
-        if (activeAction.includes('t')) {
-          const maxTopH = y + h
-          const potentialH = h - dy
-          if (potentialH >= minSize) {
-            newY = Math.max(0, y + dy)
-            newH = maxTopH - newY
-          } else {
-            newY = y + h - minSize
-            newH = minSize
-          }
-        }
-      }
-
-      setCrop({ x: newX, y: newY, w: newW, h: newH })
+      setCrop({
+        unit: '%',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100
+      })
+      setCompletedCrop({
+        unit: 'px',
+        x: 0,
+        y: 0,
+        width: img.naturalWidth,
+        height: img.naturalHeight
+      })
     }
   }
 
-  const handlePointerUp = (e: React.PointerEvent) => {
-    if (!activeAction) return
-    e.preventDefault()
-    e.stopPropagation()
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId)
-    } catch (_) {}
-    setActiveAction(null)
-    setPointerStart(null)
-    setCropStart(null)
-  }
-
-  // Draw cropped image onto Canvas and trigger onCrop callback
   const handleSave = () => {
-    if (!crop || !renderedSize) return
-
     const img = imageRef.current
-    if (!img) return
-
-    const naturalW = img.naturalWidth
-    const naturalH = img.naturalHeight
-
-    const scaleX = naturalW / renderedSize.width
-    const scaleY = naturalH / renderedSize.height
-
-    const sourceX = crop.x * scaleX
-    const sourceY = crop.y * scaleY
-    const sourceW = crop.w * scaleX
-    const sourceH = crop.h * scaleY
+    if (!img || !completedCrop) return
 
     const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      alert('Failed to process cropped canvas image context.')
+      return
+    }
 
-    // Maintain premium quality while avoiding extremely large payloads (caps crop at 1200px max)
+    const scaleX = img.naturalWidth / img.width
+    const scaleY = img.naturalHeight / img.height
+
+    const sourceX = completedCrop.x * scaleX
+    const sourceY = completedCrop.y * scaleY
+    const sourceW = completedCrop.width * scaleX
+    const sourceH = completedCrop.height * scaleY
+
+    if (sourceW <= 0 || sourceH <= 0) {
+      alert('Invalid crop dimensions.')
+      return
+    }
+
     const maxCropDim = 1200
     let destW = sourceW
     let destH = sourceH
@@ -211,12 +118,6 @@ export function ImageCropper({ imageSrc, aspectRatio, onCrop, onCancel }: ImageC
 
     canvas.width = destW
     canvas.height = destH
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-      alert('Failed to process cropped canvas image context.')
-      return
-    }
 
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = 'high'
@@ -253,6 +154,18 @@ export function ImageCropper({ imageSrc, aspectRatio, onCrop, onCancel }: ImageC
         padding: '20px',
       }}
     >
+      <style>{`
+        .ReactCrop__crop-selection {
+          border: 2px dashed var(--accent, #3b82f6) !important;
+        }
+        .ReactCrop__drag-handle::after {
+          background-color: var(--accent, #3b82f6) !important;
+          border: 2px solid #ffffff !important;
+          border-radius: 50% !important;
+          width: 12px !important;
+          height: 12px !important;
+        }
+      `}</style>
       <div
         style={{
           width: '100%',
@@ -307,12 +220,12 @@ export function ImageCropper({ imageSrc, aspectRatio, onCrop, onCancel }: ImageC
             minHeight: '280px',
           }}
         >
-          <div
-            style={{
-              position: 'relative',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-            }}
+          <ReactCrop
+            crop={crop}
+            onChange={(c) => setCrop(c)}
+            onComplete={(c) => setCompletedCrop(c)}
+            aspect={aspectRatio}
+            style={{ maxWidth: '100%', maxHeight: '55vh' }}
           >
             <img
               ref={imageRef}
@@ -323,159 +236,9 @@ export function ImageCropper({ imageSrc, aspectRatio, onCrop, onCancel }: ImageC
                 display: 'block',
                 maxWidth: '100%',
                 maxHeight: '55vh',
-                pointerEvents: 'none',
               }}
             />
-
-            {/* Crop Box and Controls overlay */}
-            {crop && renderedSize && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  pointerEvents: 'none',
-                }}
-              >
-                {/* Visual crop box */}
-                <div
-                  onPointerDown={(e) => handlePointerDown('move', e)}
-                  onPointerMove={handlePointerMove}
-                  onPointerUp={handlePointerUp}
-                  style={{
-                    position: 'absolute',
-                    top: crop.y,
-                    left: crop.x,
-                    width: crop.w,
-                    height: crop.h,
-                    border: '2px dashed var(--accent, #3b82f6)',
-                    cursor: 'move',
-                    pointerEvents: 'auto',
-                    boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.65)',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  {/* Rule of Thirds - Grid lines */}
-                  <div
-                    className="crop-grid-line-h"
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      right: 0,
-                      top: '33.33%',
-                      borderTop: '1px dashed rgba(255, 255, 255, 0.3)',
-                    }}
-                  />
-                  <div
-                    className="crop-grid-line-h"
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      right: 0,
-                      top: '66.66%',
-                      borderTop: '1px dashed rgba(255, 255, 255, 0.3)',
-                    }}
-                  />
-                  <div
-                    className="crop-grid-line-v"
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      bottom: 0,
-                      left: '33.33%',
-                      borderLeft: '1px dashed rgba(255, 255, 255, 0.3)',
-                    }}
-                  />
-                  <div
-                    className="crop-grid-line-v"
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      bottom: 0,
-                      left: '66.66%',
-                      borderLeft: '1px dashed rgba(255, 255, 255, 0.3)',
-                    }}
-                  />
-
-                  {/* Corner Handles */}
-                  {/* Top-Left */}
-                  <div
-                    onPointerDown={(e) => handlePointerDown('resize-tl', e)}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    style={{
-                      position: 'absolute',
-                      top: -6,
-                      left: -6,
-                      width: 14,
-                      height: 14,
-                      backgroundColor: 'var(--accent, #3b82f6)',
-                      border: '2px solid #ffffff',
-                      borderRadius: '50%',
-                      cursor: 'nwse-resize',
-                      pointerEvents: 'auto',
-                    }}
-                  />
-                  {/* Top-Right */}
-                  <div
-                    onPointerDown={(e) => handlePointerDown('resize-tr', e)}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    style={{
-                      position: 'absolute',
-                      top: -6,
-                      right: -6,
-                      width: 14,
-                      height: 14,
-                      backgroundColor: 'var(--accent, #3b82f6)',
-                      border: '2px solid #ffffff',
-                      borderRadius: '50%',
-                      cursor: 'nesw-resize',
-                      pointerEvents: 'auto',
-                    }}
-                  />
-                  {/* Bottom-Left */}
-                  <div
-                    onPointerDown={(e) => handlePointerDown('resize-bl', e)}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    style={{
-                      position: 'absolute',
-                      bottom: -6,
-                      left: -6,
-                      width: 14,
-                      height: 14,
-                      backgroundColor: 'var(--accent, #3b82f6)',
-                      border: '2px solid #ffffff',
-                      borderRadius: '50%',
-                      cursor: 'nesw-resize',
-                      pointerEvents: 'auto',
-                    }}
-                  />
-                  {/* Bottom-Right */}
-                  <div
-                    onPointerDown={(e) => handlePointerDown('resize-br', e)}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    style={{
-                      position: 'absolute',
-                      bottom: -6,
-                      right: -6,
-                      width: 14,
-                      height: 14,
-                      backgroundColor: 'var(--accent, #3b82f6)',
-                      border: '2px solid #ffffff',
-                      borderRadius: '50%',
-                      cursor: 'nwse-resize',
-                      pointerEvents: 'auto',
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+          </ReactCrop>
         </div>
 
         {/* Footer */}
@@ -500,7 +263,7 @@ export function ImageCropper({ imageSrc, aspectRatio, onCrop, onCancel }: ImageC
             type="button"
             className="btn btn-primary"
             onClick={handleSave}
-            disabled={!crop}
+            disabled={!completedCrop || completedCrop.width === 0}
             style={{ minWidth: '120px' }}
           >
             Apply Crop
