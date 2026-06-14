@@ -268,7 +268,7 @@ export default function BookingsPage() {
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--text-mute)' }}>Today's Date:</span>
+              <span style={{ color: 'var(--text-mute)' }}>Today&apos;s Date:</span>
               <span style={{ fontWeight: 700, color: 'var(--accent)' }}>
                 {new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}
               </span>
