@@ -53,7 +53,17 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
       type="file"
       accept="image/*"
       capture="environment"
-      hidden
+      style={{
+        position: 'absolute',
+        width: '1px',
+        height: '1px',
+        padding: 0,
+        margin: '-1px',
+        overflow: 'hidden',
+        clip: 'rect(0, 0, 0, 0)',
+        whiteSpace: 'nowrap',
+        border: 0,
+      }}
       onChange={e => {
         if (e.target.files?.[0]) handleFile(e.target.files[0])
         e.target.value = ''
