@@ -1,8 +1,8 @@
 /* ================================================================
-   SyncStay Web — Global Design System
+   SyncZen Cloud — Global Design System
    ================================================================
-   Glassmorphic dark/light theme system.
-   Dark mode is default; light mode toggled via [data-theme="light"].
+   Glassmorphic light/dark theme system.
+   Light mode is default; dark mode toggled via [data-theme="dark"].
    All colours are CSS custom properties — never hardcode values.
    ================================================================ */
 
@@ -16,53 +16,53 @@ button { cursor: pointer; font: inherit; border: none; background: none; }
 a { text-decoration: none; color: inherit; }
 input, textarea, select { font: inherit; }
 
-/* ── Dark Theme (default) ───────────────────────────────────── */
+/* ── Light Theme (default) ──────────────────────────────────── */
 :root {
   /* Core backgrounds */
-  --bg:           #0a0f1e;
-  --bg-alt:       #0d1426;
-  --surface:      #111827;
-  --surface-2:    #161f35;
-  --elevated:     #1a2540;
-  --overlay:      rgba(10, 15, 30, 0.85);
+  --bg:           #f0f4fa;
+  --bg-alt:       #e8edf6;
+  --surface:      #ffffff;
+  --surface-2:    #f5f7fc;
+  --elevated:     #eef2f9;
+  --overlay:      rgba(240, 244, 250, 0.88);
 
   /* Glass effect layers */
-  --glass-bg:     rgba(17, 24, 39, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-hover:  rgba(255, 255, 255, 0.04);
+  --glass-bg:     rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.07);
+  --glass-hover:  rgba(0, 0, 0, 0.03);
 
   /* Borders */
-  --border:       rgba(255, 255, 255, 0.07);
-  --border-hi:    rgba(255, 255, 255, 0.14);
-  --border-focus: rgba(99, 179, 237, 0.6);
+  --border:       rgba(0, 0, 0, 0.08);
+  --border-hi:    rgba(0, 0, 0, 0.14);
+  --border-focus: rgba(59, 130, 246, 0.5);
 
   /* Accent — electric blue */
-  --accent:       #3b82f6;
-  --accent-hi:    #60a5fa;
-  --accent-lo:    #2563eb;
-  --accent-dim:   rgba(59, 130, 246, 0.12);
-  --accent-glow:  rgba(59, 130, 246, 0.25);
+  --accent:       #2563eb;
+  --accent-hi:    #3b82f6;
+  --accent-lo:    #1d4ed8;
+  --accent-dim:   rgba(37, 99, 235, 0.1);
+  --accent-glow:  rgba(37, 99, 235, 0.2);
 
   /* Semantic colours */
-  --green:        #22c55e;
-  --green-dim:    rgba(34, 197, 94, 0.12);
-  --amber:        #f59e0b;
-  --amber-dim:    rgba(245, 158, 11, 0.12);
-  --red:          #ef4444;
-  --red-dim:      rgba(239, 68, 68, 0.12);
-  --purple:       #a78bfa;
-  --purple-dim:   rgba(167, 139, 250, 0.12);
+  --green:        #16a34a;
+  --green-dim:    rgba(22, 163, 74, 0.1);
+  --amber:        #d97706;
+  --amber-dim:    rgba(217, 119, 6, 0.1);
+  --red:          #dc2626;
+  --red-dim:      rgba(220, 38, 38, 0.1);
+  --purple:       #7c3aed;
+  --purple-dim:   rgba(124, 58, 237, 0.1);
 
   /* Text */
-  --text-pri:     #f0f6ff;
-  --text-sec:     #94a3b8;
-  --text-mute:    #475569;
-  --text-inv:     #0a0f1e;
+  --text-pri:     #0f172a;
+  --text-sec:     #475569;
+  --text-mute:    #94a3b8;
+  --text-inv:     #ffffff;
 
   /* Shadows */
-  --shadow-sm:    0 1px 3px rgba(0,0,0,0.4);
-  --shadow-md:    0 4px 16px rgba(0,0,0,0.45);
-  --shadow-lg:    0 8px 32px rgba(0,0,0,0.55);
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.1);
+  --shadow-lg:    0 8px 32px rgba(0,0,0,0.14);
   --shadow-glow:  0 0 24px var(--accent-glow);
 
   /* Spacing */
@@ -101,46 +101,53 @@ input, textarea, select { font: inherit; }
   --sidebar-w: 240px;
 }
 
-/* ── Light Theme ────────────────────────────────────────────── */
-[data-theme="light"] {
-  --bg:           #f0f4fa;
-  --bg-alt:       #e8edf6;
-  --surface:      #ffffff;
-  --surface-2:    #f5f7fc;
-  --elevated:     #eef2f9;
-  --overlay:      rgba(240, 244, 250, 0.88);
+/* ── Dark Theme — true grey/charcoal (not navy) ─────────────── */
+[data-theme="dark"] {
+  /* Core backgrounds — neutral dark grey */
+  --bg:           #111111;
+  --bg-alt:       #161616;
+  --surface:      #1c1c1c;
+  --surface-2:    #222222;
+  --elevated:     #2a2a2a;
+  --overlay:      rgba(10, 10, 10, 0.85);
 
-  --glass-bg:     rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(0, 0, 0, 0.07);
-  --glass-hover:  rgba(0, 0, 0, 0.03);
+  /* Glass effect layers */
+  --glass-bg:     rgba(28, 28, 28, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-hover:  rgba(255, 255, 255, 0.04);
 
-  --border:       rgba(0, 0, 0, 0.08);
-  --border-hi:    rgba(0, 0, 0, 0.14);
-  --border-focus: rgba(59, 130, 246, 0.5);
+  /* Borders */
+  --border:       rgba(255, 255, 255, 0.07);
+  --border-hi:    rgba(255, 255, 255, 0.13);
+  --border-focus: rgba(99, 179, 237, 0.6);
 
-  --accent:       #2563eb;
-  --accent-hi:    #3b82f6;
-  --accent-lo:    #1d4ed8;
-  --accent-dim:   rgba(37, 99, 235, 0.1);
-  --accent-glow:  rgba(37, 99, 235, 0.2);
+  /* Accent — electric blue */
+  --accent:       #3b82f6;
+  --accent-hi:    #60a5fa;
+  --accent-lo:    #2563eb;
+  --accent-dim:   rgba(59, 130, 246, 0.12);
+  --accent-glow:  rgba(59, 130, 246, 0.25);
 
-  --green:        #16a34a;
-  --green-dim:    rgba(22, 163, 74, 0.1);
-  --amber:        #d97706;
-  --amber-dim:    rgba(217, 119, 6, 0.1);
-  --red:          #dc2626;
-  --red-dim:      rgba(220, 38, 38, 0.1);
-  --purple:       #7c3aed;
-  --purple-dim:   rgba(124, 58, 237, 0.1);
+  /* Semantic colours */
+  --green:        #22c55e;
+  --green-dim:    rgba(34, 197, 94, 0.12);
+  --amber:        #f59e0b;
+  --amber-dim:    rgba(245, 158, 11, 0.12);
+  --red:          #ef4444;
+  --red-dim:      rgba(239, 68, 68, 0.12);
+  --purple:       #a78bfa;
+  --purple-dim:   rgba(167, 139, 250, 0.12);
 
-  --text-pri:     #0f172a;
-  --text-sec:     #475569;
-  --text-mute:    #94a3b8;
-  --text-inv:     #ffffff;
+  /* Text */
+  --text-pri:     #f0f0f0;
+  --text-sec:     #a0a0a0;
+  --text-mute:    #555555;
+  --text-inv:     #111111;
 
-  --shadow-sm:    0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md:    0 4px 16px rgba(0,0,0,0.1);
-  --shadow-lg:    0 8px 32px rgba(0,0,0,0.14);
+  /* Shadows */
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.5);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.55);
+  --shadow-lg:    0 8px 32px rgba(0,0,0,0.65);
   --shadow-glow:  0 0 24px var(--accent-glow);
 }
 

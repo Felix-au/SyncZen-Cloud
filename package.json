@@ -1,7 +1,7 @@
 {
-  "name": "syncstay-web",
+  "name": "synczen-cloud-web",
   "version": "1.0.0",
-  "description": "SyncStay Web — Cloud hotel check-in platform",
+  "description": "SyncZen Cloud Web — Cloud hotel check-in platform",
   "private": true,
   "scripts": {
     "dev": "next dev",

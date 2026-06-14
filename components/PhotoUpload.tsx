@@ -14,21 +14,19 @@ interface PhotoUploadProps {
 
 /**
  * Reusable photo upload component.
- * - Click or drag-and-drop a file from the file system
- * - "Use Camera" button on devices that have a camera (mobile/tablet)
- * Converts file to base64 data URI, resizes to max 1024px via canvas.
+ *
+ * Three ways to add a photo:
+ *   1. Click the drop zone / avatar → file picker (all devices)
+ *   2. Drag & drop onto the drop zone (desktop)
+ *   3. "Use Camera" button → opens rear camera directly on mobile
+ *      (uses capture="environment"; on desktop this opens the file picker)
+ *
+ * Converts the chosen image to base64, resizes to max 1024px via canvas.
  */
 export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', compact = false }: PhotoUploadProps) {
-  const [dragging, setDragging]   = useState(false)
+  const [dragging, setDragging] = useState(false)
   const fileRef   = useRef<HTMLInputElement>(null)
   const cameraRef = useRef<HTMLInputElement>(null)
-
-  /** True if the device likely has a camera (mobile/tablet).
-   *  We detect via the MediaDevices API — falls back to false on desktop. */
-  const [hasCamera] = useState<boolean>(() => {
-    if (typeof navigator === 'undefined') return false
-    return !!(navigator.mediaDevices || (navigator as any).getUserMedia)
-  })
 
   function handleFile(file: File) {
     if (!file.type.startsWith('image/')) return
@@ -36,7 +34,6 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
     const reader = new FileReader()
     reader.onload = (e) => {
       const dataUri = e.target?.result as string
-      // Resize to max 1024px to keep upload size reasonable
       const img = new Image()
       img.onload = () => {
         const canvas  = document.createElement('canvas')
@@ -61,6 +58,7 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
   if (compact) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        {/* Main click target */}
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
@@ -84,23 +82,40 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
           }
         </button>
 
-        {/* Camera button — shown only on devices with a camera */}
-        {hasCamera && (
-          <button
-            type="button"
-            onClick={() => cameraRef.current?.click()}
-            style={{
-              fontSize: 10, color: 'var(--accent)', background: 'none', border: 'none',
-              cursor: 'pointer', padding: '2px 4px', borderRadius: 4,
-            }}
-          >
-            📸 Camera
-          </button>
-        )}
+        {/* Camera shortcut — always shown; capture attr opens camera on mobile,
+            falls back to file picker on desktop browsers that ignore capture */}
+        <button
+          type="button"
+          onClick={() => cameraRef.current?.click()}
+          style={{
+            fontSize: 10, color: 'var(--accent)', background: 'none', border: 'none',
+            cursor: 'pointer', padding: '2px 4px', borderRadius: 4,
+            textDecoration: 'underline', textDecorationStyle: 'dotted',
+          }}
+        >
+          📸 Camera
+        </button>
 
         {/* Hidden inputs */}
-        <input ref={fileRef}   type="file" accept="image/*"             hidden onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
-        <input ref={cameraRef} type="file" accept="image/*" capture="environment" hidden onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])}
+        />
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          onChange={e => {
+            if (e.target.files?.[0]) handleFile(e.target.files[0])
+            // Reset so the same file can be re-captured
+            e.target.value = ''
+          }}
+        />
       </div>
     )
   }
@@ -109,6 +124,7 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
   return (
     <div>
       {label && <div className="input-label" style={{ marginBottom: 8 }}>{label}</div>}
+
       <div
         className={`photo-drop ${dragging ? 'dragging' : ''}`}
         onClick={() => fileRef.current?.click()}
@@ -133,21 +149,35 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
         )}
       </div>
 
-      {/* Camera shortcut — visible only on devices with a camera */}
-      {hasCamera && !previewUrl && (
-        <button
-          type="button"
-          onClick={() => cameraRef.current?.click()}
-          className="btn btn-ghost btn-sm"
-          style={{ marginTop: 8 }}
-        >
-          📷 Use Camera
-        </button>
-      )}
+      {/* Camera button — always rendered; on mobile opens rear camera directly */}
+      <button
+        type="button"
+        onClick={() => cameraRef.current?.click()}
+        className="btn btn-ghost btn-sm"
+        style={{ marginTop: 8, gap: 6 }}
+      >
+        📷 Use Camera
+      </button>
 
       {/* Hidden inputs */}
-      <input ref={fileRef}   type="file" accept="image/*"             hidden onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
-      <input ref={cameraRef} type="file" accept="image/*" capture="environment" hidden onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])}
+      />
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+        onChange={e => {
+          if (e.target.files?.[0]) handleFile(e.target.files[0])
+          e.target.value = ''
+        }}
+      />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
@@ -69,9 +69,9 @@ export default function RegisterPage() {
     <div className="auth-page">
       <div className="glass-card auth-card">
         <div className="auth-logo">
-          <Image src="/logo.png" alt="SyncStay" width={52} height={52} style={{ borderRadius: 12, objectFit: 'contain', marginBottom: 8 }} />
+          <Image src="/logo.png" alt="SyncZen Cloud" width={52} height={52} style={{ borderRadius: 12, objectFit: 'contain', marginBottom: 8 }} />
           <div className="auth-title">Create account</div>
-          <div className="auth-subtitle">Join SyncStay — register your hotel or join a team</div>
+          <div className="auth-subtitle">Join SyncZen Cloud — register your hotel or join a team</div>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>

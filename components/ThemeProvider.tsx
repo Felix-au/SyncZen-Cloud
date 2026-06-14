@@ -10,36 +10,44 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: 'dark',
+  theme: 'light',
   toggle: () => {},
 })
 
 /**
  * ThemeProvider — manages dark/light mode.
  *
- * Persists the selected theme in localStorage and applies it as a
- * `data-theme` attribute on <html>. This way all CSS variables defined
- * in globals.css for [data-theme="light"] respond immediately.
+ * Light mode is the default. Dark mode is applied by setting
+ * data-theme="dark" on <html>; the :root variables cover light mode
+ * so no attribute is needed for it.
  *
- * Defaults to dark mode if no preference is stored.
+ * Persists preference in localStorage under 'synczen-theme'.
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark')
+  const [theme, setTheme] = useState<Theme>('light')
 
   // Load stored preference on mount (client only)
   useEffect(() => {
-    const stored = localStorage.getItem('syncstay-theme') as Theme | null
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const initial = stored ?? (systemDark ? 'dark' : 'light')
+    const stored = localStorage.getItem('synczen-theme') as Theme | null
+    // If user has no stored preference, default to light
+    const initial: Theme = stored ?? 'light'
+    apply(initial)
     setTheme(initial)
-    document.documentElement.setAttribute('data-theme', initial)
   }, [])
+
+  function apply(t: Theme) {
+    if (t === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark')
+    } else {
+      document.documentElement.removeAttribute('data-theme')
+    }
+  }
 
   const toggle = () => {
     const next: Theme = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)
-    document.documentElement.setAttribute('data-theme', next)
-    localStorage.setItem('syncstay-theme', next)
+    apply(next)
+    localStorage.setItem('synczen-theme', next)
   }
 
   return (

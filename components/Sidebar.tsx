@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import Image from 'next/image'
@@ -41,9 +41,9 @@ export function Sidebar() {
     <aside className="sidebar">
       {/* Brand */}
       <div className="sidebar-brand">
-        <Image src="/logo.png" alt="SyncStay" width={36} height={36} style={{ borderRadius: 8, objectFit: 'contain' }} />
+        <Image src="/logo.png" alt="SyncZen Cloud" width={36} height={36} style={{ borderRadius: 8, objectFit: 'contain' }} />
         <div>
-          <div className="sidebar-name">SyncStay</div>
+          <div className="sidebar-name">SyncZen Cloud</div>
           <div className="sidebar-tag">{isSuper ? 'Super Admin' : 'Hotel Cloud'}</div>
         </div>
       </div>

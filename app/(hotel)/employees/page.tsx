@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
@@ -151,7 +151,7 @@ export default function EmployeesPage() {
       >
         {addError && <div style={{ color: 'var(--red)', fontSize: 'var(--fs-sm)' }}>{addError}</div>}
         <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)' }}>
-          The employee must already have a registered SyncStay account. They&apos;ll be immediately associated with your hotel.
+          The employee must already have a registered SyncZen Cloud account. They&apos;ll be immediately associated with your hotel.
         </p>
         <div className="input-group">
           <label className="input-label" htmlFor="emp-email">Email address</label>

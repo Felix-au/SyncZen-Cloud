@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
@@ -131,7 +131,7 @@ export default function SettingsPage() {
       <div className="page-container">
         <div className="page-header">
           <h1 className="page-title">Register Your Hotel</h1>
-          <p className="page-subtitle">Create your hotel profile to get started with SyncStay</p>
+          <p className="page-subtitle">Create your hotel profile to get started with SyncZen Cloud</p>
         </div>
         <div className="glass-card" style={{ padding: 'var(--sp-xl)', maxWidth: 560 }}>
           <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}>
