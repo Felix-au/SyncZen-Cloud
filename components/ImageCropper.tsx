@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 interface ImageCropperProps {
   imageSrc: string
@@ -22,10 +23,15 @@ interface RenderedSize {
 }
 
 export function ImageCropper({ imageSrc, aspectRatio, onCrop, onCancel }: ImageCropperProps) {
+  const [mounted, setMounted] = useState(false)
   const [crop, setCrop] = useState<CropArea | null>(null)
   const [renderedSize, setRenderedSize] = useState<RenderedSize | null>(null)
   const [activeAction, setActiveAction] = useState<string | null>(null)
   const [pointerStart, setPointerStart] = useState<{ x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   const [cropStart, setCropStart] = useState<CropArea | null>(null)
 
   const imageRef = useRef<HTMLImageElement>(null)
@@ -231,7 +237,9 @@ export function ImageCropper({ imageSrc, aspectRatio, onCrop, onCancel }: ImageC
     onCrop(croppedDataUri)
   }
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <div
       style={{
         position: 'fixed',
@@ -499,6 +507,7 @@ export function ImageCropper({ imageSrc, aspectRatio, onCrop, onCancel }: ImageC
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
