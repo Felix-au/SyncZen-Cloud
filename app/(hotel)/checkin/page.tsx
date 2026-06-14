@@ -191,7 +191,7 @@ export default function CheckInPage() {
       {/* Step bar */}
       <StepWizard steps={STEPS} currentStep={step} />
 
-      <div style={{ flex: 1, padding: 'var(--sp-xl) var(--sp-2xl)', maxWidth: 800, margin: '0 auto', width: '100%' }}>
+      <div className="checkin-content" style={{ flex: 1, padding: 'var(--sp-xl) var(--sp-2xl)', maxWidth: 800, margin: '0 auto', width: '100%' }}>
 
         {/* ── Step 1: Guest Details ─────────────────────────────────── */}
         {step === 'guests' && (
@@ -243,7 +243,7 @@ export default function CheckInPage() {
                     {idx > 0 && <button className="btn btn-danger btn-sm" onClick={() => removeGuest(idx)}>Remove</button>}
                   </div>
 
-                  <div style={{
+                  <div className="guest-grid" style={{
                     display: 'grid',
                     gridTemplateAreas: `
                       "photo name"
@@ -432,7 +432,7 @@ export default function CheckInPage() {
         )}
 
         {/* ── Navigation buttons ────────────────────────────────────── */}
-        <div className="flex justify-between mt-xl">
+        <div className="checkin-nav flex justify-between mt-xl">
           <button className="btn btn-ghost" onClick={goPrev} disabled={step === 'rooms' || submitting}>
             ← Back
           </button>

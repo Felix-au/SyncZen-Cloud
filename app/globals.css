@@ -1068,5 +1068,72 @@ tbody tr:last-child td { border-bottom: none; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
   .grid-2 { grid-template-columns: 1fr; }
-}
 
+  /* ── Check-in wizard mobile ──────────────────────────────── */
+  .checkin-content {
+    padding: var(--sp-md) !important;
+  }
+
+  /* Guest card: photo + name/phone in top, age/sex below */
+  .guest-grid {
+    grid-template-columns: 52px 1fr !important;
+    gap: var(--sp-sm) !important;
+  }
+
+  /* Nav buttons: stack vertically, full width */
+  .checkin-nav {
+    flex-direction: column-reverse;
+    gap: var(--sp-sm);
+  }
+
+  .checkin-nav .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Room cards: single column */
+  .room-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* ── Employees table → card layout on mobile ─────────────── */
+  .emp-table thead { display: none; }
+
+  .emp-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: var(--sp-md);
+    border-bottom: 1px solid var(--border);
+    cursor: default;
+  }
+
+  .emp-table tbody tr:hover { background: none; }
+
+  .emp-table td {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    border: none;
+    font-size: var(--fs-sm);
+  }
+
+  /* Name row */
+  .emp-table td:nth-child(1) {
+    font-size: var(--fs-md);
+    font-weight: 700;
+  }
+
+  /* Actions row */
+  .emp-table td:last-child {
+    margin-top: 4px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Hide username & joined date columns to save space */
+  .emp-table td:nth-child(2),
+  .emp-table td:nth-child(5) {
+    display: none;
+  }
+}

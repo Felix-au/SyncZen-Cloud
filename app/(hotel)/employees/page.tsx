@@ -151,7 +151,7 @@ export default function EmployeesPage() {
       ) : (
         <div className="glass-card">
           <div className="table-wrap" style={{ border: 'none', borderRadius: 0 }}>
-            <table>
+            <table className="emp-table">
               <thead>
                 <tr>
                   <th>Name</th>
