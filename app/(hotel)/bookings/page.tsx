@@ -146,7 +146,7 @@ export default function BookingsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-md flex-wrap mb-lg items-center">
+      <div className="bookings-filters flex gap-md flex-wrap mb-lg items-center">
         <form onSubmit={handleSearch} className="flex gap-sm flex-1">
           <input
             className="input"
@@ -158,8 +158,8 @@ export default function BookingsPage() {
           <button type="submit" className="btn btn-ghost btn-sm">Search</button>
           {search && <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setSearch(''); setPage(1); load(status, '', 1) }}>Clear</button>}
         </form>
-        <div className="flex gap-sm">
-          {[['', 'All'], ['checked_in', 'Active'], ['checked_out', 'Checked Out'], ['cancelled', 'Cancelled']].map(([val, label]) => (
+        <div className="status-group flex gap-sm">
+          {[['', 'All'], ['checked_in', 'Active'], ['checked_out', 'Checked Out']].map(([val, label]) => (
             <button
               key={val}
               className={`btn btn-sm ${status === val ? 'btn-primary' : 'btn-ghost'}`}

@@ -1535,4 +1535,29 @@ tbody tr:last-child td {
   .emp-table td:nth-child(5) {
     display: none;
   }
+
+  /* Bookings filters mobile layout */
+  .bookings-filters {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--sp-sm) !important;
+  }
+  .bookings-filters form {
+    width: 100%;
+    flex: none !important;
+  }
+  .bookings-filters form input {
+    max-width: none !important;
+    flex: 1;
+  }
+  .bookings-filters .status-group {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-xs);
+  }
+  .bookings-filters .status-group .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
