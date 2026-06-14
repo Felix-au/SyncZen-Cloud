@@ -16,8 +16,8 @@ export interface IGuest {
   phone?: string
   age?: number
   sex?: 'male' | 'female' | 'other'
-  photoFileId?: string   // Google Drive file ID
-  photoUrl?: string      // Public CDN URL (drive.google.com thumbnail)
+  photoFileId?: string
+  photoUrl?: string
   isPrimary: boolean
 }
 
@@ -29,11 +29,13 @@ export interface IBooking extends Document {
   status: 'checked_in' | 'checked_out' | 'cancelled'
   roomIds: mongoose.Types.ObjectId[]
   guests: IGuest[]
-  idProofFileId?: string          // Google Drive file ID for group ID document
-  idProofUrl?: string             // Public CDN URL
+  idProofFileId?: string
+  idProofUrl?: string
   notes?: string
   nights: number
-  createdBy: mongoose.Types.ObjectId  // User who performed the check-in
+  /** Custom per-night charge set at check-in time. Overrides room's pricePerNight. */
+  customChargePerNight?: number
+  createdBy: mongoose.Types.ObjectId
   createdAt: Date
 }
 
@@ -68,6 +70,7 @@ const BookingSchema = new Schema<IBooking>(
     idProofUrl: { type: String },
     notes: { type: String, trim: true },
     nights: { type: Number, required: true, min: 1 },
+    customChargePerNight: { type: Number, min: 0 },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   {

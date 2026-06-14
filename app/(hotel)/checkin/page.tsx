@@ -31,6 +31,7 @@ export default function CheckInPage() {
   // Step 1 — Room selection
   const [availableRooms, setAvailableRooms] = useState<Room[]>([])
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([])
+  const [customChargePerNight, setCustomChargePerNight] = useState('')
 
   // Step 2 — Guests
   const [guests, setGuests] = useState<Guest[]>([EMPTY_GUEST()])
@@ -148,6 +149,7 @@ export default function CheckInPage() {
           idProofFileId,
           idProofUrl,
           notes: notes.trim() || undefined,
+          customChargePerNight: customChargePerNight ? Number(customChargePerNight) : undefined,
         }),
       })
 
@@ -385,7 +387,21 @@ export default function CheckInPage() {
                 </div>
                 <div style={{ marginTop: 'var(--sp-md)', fontSize: 'var(--fs-sm)', color: 'var(--text-sec)' }}>
                   Check-out: <strong>{checkOutDate}</strong> · {nights} night{nights !== 1 ? 's' : ''}
-                  {totalPrice > 0 && <> · Total: <strong style={{ color: 'var(--accent)' }}>₹{totalPrice.toLocaleString()}</strong></>}
+                  {(() => {
+                    const chargePerNight = customChargePerNight
+                      ? Number(customChargePerNight)
+                      : totalPrice / nights
+                    const totalCharge = chargePerNight * nights
+                    return totalCharge > 0 ? (
+                      <>
+                        {' '}·{' '}
+                        {customChargePerNight && (
+                          <span style={{ color: 'var(--amber)', fontSize: 'var(--fs-xs)' }}>custom rate </span>
+                        )}
+                        ₹{chargePerNight.toLocaleString()}/night · Total: <strong style={{ color: 'var(--accent)' }}>₹{totalCharge.toLocaleString()}</strong>
+                      </>
+                    ) : null
+                  })()}
                 </div>
               </div>
 

@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { guests, roomIds, checkOutDate, nights, idProofFileId, idProofUrl, notes } = await req.json()
+    const { guests, roomIds, checkOutDate, nights, idProofFileId, idProofUrl, notes, customChargePerNight } = await req.json()
 
     // Validate required fields
     if (!guests?.length)  return NextResponse.json({ error: 'At least one guest is required' }, { status: 400 })
@@ -134,6 +134,7 @@ export async function POST(req: NextRequest) {
       notes: notes?.trim() || undefined,
       status: 'checked_in',
       createdBy: session.user.id,
+      customChargePerNight: customChargePerNight ? Number(customChargePerNight) : undefined,
     })
 
     // Mark rooms as occupied
