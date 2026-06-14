@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import Booking from '@/lib/models/Booking'
 import Room from '@/lib/models/Room'
+import '@/lib/models/User'   // ensure User schema is registered for .populate('createdBy')
 import { auth } from '@/lib/auth'
 import { canCheckIn } from '@/lib/roles'
 

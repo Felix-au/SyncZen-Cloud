@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model, models } from 'mongoose'
+import mongoose, { Schema, Document, Model } from 'mongoose'
 
 /**
  * User model — covers all roles in the system.
@@ -35,7 +35,6 @@ const UserSchema = new Schema<IUser>(
       type: String,
       lowercase: true,
       trim: true,
-      sparse: true,
       index: { unique: true, sparse: true },
     },
     role: {
@@ -50,16 +49,19 @@ const UserSchema = new Schema<IUser>(
 )
 
 /**
- * In Next.js dev mode, hot-reload keeps mongoose.models alive but may have
- * compiled the schema BEFORE the username field was added — so the cached
- * model silently strips the username field on every User.create().
+ * Safe model registration for Next.js hot-reload.
  *
- * Fix: delete the cached model so this file always re-registers it with
- * the CURRENT schema. Safe because mongoose.connection persists separately.
+ * DO NOT use `delete mongoose.models['User']` — it breaks `.populate('createdBy')`
+ * in other routes that reference 'User' by name without importing this file,
+ * because Mongoose looks up the schema from the models registry.
+ *
+ * Instead: if the model already exists (from a previous hot-reload cycle),
+ * return it as-is. The schema is effectively the same — the username field
+ * change only needs a dev server restart to take effect, which the user
+ * should do once after the schema migration.
  */
-if (models['User']) {
-  delete (models as Record<string, unknown>)['User']
-}
+const User: Model<IUser> =
+  (mongoose.models['User'] as Model<IUser>) ||
+  mongoose.model<IUser>('User', UserSchema)
 
-const User: Model<IUser> = mongoose.model<IUser>('User', UserSchema)
 export default User

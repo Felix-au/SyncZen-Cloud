@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import Booking from '@/lib/models/Booking'
+import '@/lib/models/User'   // register User schema for .populate('createdBy')
 import { auth } from '@/lib/auth'
 import { canCheckIn, isSuperAdmin } from '@/lib/roles'
 

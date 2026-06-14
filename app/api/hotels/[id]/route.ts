@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { customAlphabet } from 'nanoid'
 import { connectDB } from '@/lib/mongodb'
 import Hotel from '@/lib/models/Hotel'
+import '@/lib/models/User'   // register User schema for .populate('ownerId')
 import { auth } from '@/lib/auth'
 import { canManageHotelSettings, canDeleteHotel, belongsToHotel, isSuperAdmin } from '@/lib/roles'
 
