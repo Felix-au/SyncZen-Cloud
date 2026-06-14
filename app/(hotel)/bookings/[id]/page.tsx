@@ -48,14 +48,14 @@ interface Booking {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  checked_in:   'badge-green',
-  checked_out:  'badge-muted',
-  cancelled:    'badge-red',
+  checked_in: 'badge-green',
+  checked_out: 'badge-muted',
+  cancelled: 'badge-red',
 }
 
 export default function BookingDetailPage() {
-  const { id }     = useParams<{ id: string }>()
-  const router     = useRouter()
+  const { id } = useParams<{ id: string }>()
+  const router = useRouter()
   const [booking, setBooking] = useState<Booking | null>(null)
   const [loading, setLoading] = useState(true)
   const [checking, setChecking] = useState(false)
@@ -77,7 +77,7 @@ export default function BookingDetailPage() {
 
   async function triggerCheckoutFlow() {
     if (!booking) return
-    
+
     // Check if scheduled check-out date is today (calendar dates comparison)
     const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }) // YYYY-MM-DD
     const bookingCheckoutLocal = new Date(booking.checkOutDate).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
@@ -93,7 +93,7 @@ export default function BookingDetailPage() {
     if (!booking) return
     const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
     setChecking(true)
-    
+
     try {
       const res = await fetch(`/api/bookings/${id}`, {
         method: 'PATCH',
@@ -101,7 +101,7 @@ export default function BookingDetailPage() {
         body: JSON.stringify({ checkOutDate: todayLocal })
       })
       const data = res.ok ? await res.json() : null
-      
+
       if (res.ok && data?.booking) {
         setBooking(data.booking)
         setShowDateMismatchModal(false)
@@ -183,8 +183,8 @@ export default function BookingDetailPage() {
 
   const chargePerNight = booking.customChargePerNight
     ?? booking.rooms.reduce((sum, r) => sum + r.pricePerNight, 0)
-  const totalValue  = chargePerNight * booking.nights
-  const primary     = booking.guests.find(g => g.isPrimary) ?? booking.guests[0]
+  const totalValue = chargePerNight * booking.nights
+  const primary = booking.guests.find(g => g.isPrimary) ?? booking.guests[0]
 
   return (
     <div className="page-container">
@@ -332,8 +332,8 @@ export default function BookingDetailPage() {
             </div>
             <div style={{ padding: 'var(--sp-md) var(--sp-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-sm)' }}>
               {[
-                ['Check-in',      new Date(booking.checkInTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })],
-                ['Check-out',     (
+                ['Check-in', new Date(booking.checkInTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })],
+                ['Check-out', (
                   isEditingDate ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={e => e.stopPropagation()}>
                       <input
@@ -370,19 +370,19 @@ export default function BookingDetailPage() {
                     </div>
                   )
                 )],
-                ['Nights',        booking.nights],
+                ['Nights', booking.nights],
                 ['Charge / night', booking.customChargePerNight
                   ? `₹${booking.customChargePerNight.toLocaleString()} (custom)`
                   : booking.rooms.reduce((s, r) => s + r.pricePerNight, 0) > 0
                     ? `₹${booking.rooms.reduce((s, r) => s + r.pricePerNight, 0).toLocaleString()}`
                     : '—'],
-                ['Checked in by',  booking.createdBy?.name ?? '—'],
-                ['Nationality',    booking.nationality ?? 'India'],
+                ['Checked in by', booking.createdBy?.name ?? '—'],
+                ['Nationality', booking.nationality ?? 'India'],
                 ['Purpose of Travel', booking.purposeOfTravel ?? '—'],
-                ['Payment Mode',   booking.paymentMode ? booking.paymentMode.toUpperCase() : 'CASH'],
-                ['Total Guests',   booking.totalGuests ?? booking.guests.length],
+                ['Payment Mode', booking.paymentMode ? booking.paymentMode.toUpperCase() : 'CASH'],
+                ['Total Guests', booking.totalGuests ?? booking.guests.length],
                 ['Guest Breakdown', `Male: ${booking.maleGuestsCount ?? 0} · Female: ${booking.femaleGuestsCount ?? 0} · Child: ${booking.childGuestsCount ?? 0}`],
-                ['Address',        booking.address ?? '—'],
+                ['Address', booking.address ?? '—'],
                 ...(booking.notes ? [['Notes', booking.notes]] : []),
               ].map(([label, value]) => (
                 <div key={label as string} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBlock: 6, borderBottom: '1px solid var(--border)' }}>
@@ -467,9 +467,8 @@ export default function BookingDetailPage() {
         title="Check-Out Date Mismatch"
         footer={
           <>
-            <button className="btn btn-ghost" onClick={() => setShowDateMismatchModal(false)}>Cancel</button>
             <button className="btn btn-ghost text-amber" onClick={() => { setShowDateMismatchModal(false); setShowCheckoutOptionsModal(true) }}>
-              Keep Scheduled &amp; Proceed
+              Ignore
             </button>
             <button className="btn btn-primary" onClick={handleUpdateCheckoutToToday} disabled={checking}>
               {checking ? <span className="spinner" /> : null}
@@ -518,9 +517,9 @@ export default function BookingDetailPage() {
           <p style={{ fontSize: 'var(--fs-md)', color: 'var(--text-pri)', textAlign: 'center' }}>
             Please select how the rooms should be marked upon check-out:
           </p>
-          
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div 
+            <div
               onClick={() => { if (!checking) handleCheckoutConfirm('serviced') }}
               style={{
                 border: '1px solid var(--border)',
@@ -545,7 +544,7 @@ export default function BookingDetailPage() {
               </p>
             </div>
 
-            <div 
+            <div
               onClick={() => { if (!checking) handleCheckoutConfirm('maintenance') }}
               style={{
                 border: '1px solid var(--border)',

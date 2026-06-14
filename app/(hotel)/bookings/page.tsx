@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Modal } from '@/components/Modal'
 
 interface Booking {
   _id: string
@@ -16,26 +17,32 @@ interface Booking {
 }
 
 const STATUS_CLASS: Record<string, string> = {
-  checked_in:  'badge-green',
+  checked_in: 'badge-green',
   checked_out: 'badge-muted',
-  cancelled:   'badge-red',
+  cancelled: 'badge-red',
 }
 
 export default function BookingsPage() {
   const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
-  const [total, setTotal]       = useState(0)
-  const [loading, setLoading]   = useState(true)
-  const [status, setStatus]     = useState('')
-  const [search, setSearch]     = useState('')
-  const [page, setPage]         = useState(1)
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState('')
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+
+  // Checkout flow state
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
+  const [showDateMismatchModal, setShowDateMismatchModal] = useState(false)
+  const [showCheckoutOptionsModal, setShowCheckoutOptionsModal] = useState(false)
+  const [checking, setChecking] = useState(false)
 
   async function load(s = status, q = search, p = page) {
     setLoading(true)
     const params = new URLSearchParams({ limit: '20', page: String(p) })
     if (s) params.set('status', s)
     if (q) params.set('search', q)
-    const res  = await fetch(`/api/bookings?${params}`)
+    const res = await fetch(`/api/bookings?${params}`)
     const data = await res.json()
     setBookings(data.bookings ?? [])
     setTotal(data.total ?? 0)
@@ -51,11 +58,81 @@ export default function BookingsPage() {
     load(status, search, 1)
   }
 
-  async function handleCheckout(id: string, ref: string) {
-    if (!confirm(`Check out booking ${ref}?`)) return
-    const res = await fetch(`/api/bookings/${id}/checkout`, { method: 'POST' })
-    if (!res.ok) { const d = await res.json(); alert(d.error); return }
-    load()
+  async function handleCheckoutTrigger(bookingItem: Booking) {
+    console.log('handleCheckoutTrigger called for:', bookingItem)
+    try {
+      setSelectedBooking(bookingItem)
+      
+      // Check if scheduled check-out date is today (calendar dates comparison in IST)
+      const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }) // YYYY-MM-DD
+      const bookingCheckoutLocal = new Date(bookingItem.checkOutDate).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
+
+      console.log('todayLocal:', todayLocal, 'bookingCheckoutLocal:', bookingCheckoutLocal)
+
+      if (todayLocal !== bookingCheckoutLocal) {
+        console.log('Opening Date Mismatch warning modal')
+        setShowDateMismatchModal(true)
+      } else {
+        console.log('Opening Checkout Status Options modal')
+        setShowCheckoutOptionsModal(true)
+      }
+    } catch (err: any) {
+      console.error('Error in handleCheckoutTrigger:', err)
+      alert('Error triggering checkout flow: ' + (err?.message ?? err))
+    }
+  }
+
+  async function handleUpdateCheckoutToToday() {
+    if (!selectedBooking) return
+    const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
+    setChecking(true)
+
+    try {
+      const res = await fetch(`/api/bookings/${selectedBooking._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ checkOutDate: todayLocal })
+      })
+      const data = res.ok ? await res.json() : null
+
+      if (res.ok && data?.booking) {
+        setBookings(prev => prev.map(b => b._id === selectedBooking._id ? { ...b, checkOutDate: data.booking.checkOutDate, nights: data.booking.nights } : b))
+        setShowDateMismatchModal(false)
+        setShowCheckoutOptionsModal(true)
+      } else {
+        alert(data?.error ?? 'Failed to update checkout date to today.')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Error updating checkout date.')
+    } finally {
+      setChecking(false)
+    }
+  }
+
+  async function handleCheckoutConfirm(action: 'serviced' | 'maintenance') {
+    if (!selectedBooking) return
+    setChecking(true)
+    try {
+      const res = await fetch(`/api/bookings/${selectedBooking._id}/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      })
+      if (res.ok) {
+        setShowCheckoutOptionsModal(false)
+        load() // reload bookings list
+      } else {
+        const data = await res.json()
+        alert(data?.error ?? 'Checkout failed')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Checkout error')
+    } finally {
+      setChecking(false)
+      setSelectedBooking(null)
+    }
   }
 
   return (
@@ -94,16 +171,13 @@ export default function BookingsPage() {
         </div>
       </div>
 
-      {/* Table */}
       {loading ? (
-        <div className="flex justify-center" style={{ padding: 'var(--sp-3xl)' }}>
-          <span className="spinner spinner-lg" />
-        </div>
+        <div className="flex justify-center" style={{ padding: 'var(--sp-3xl)' }}><span className="spinner spinner-lg" /></div>
       ) : bookings.length === 0 ? (
         <div className="glass-card empty-state">
           <span className="empty-icon">📋</span>
           <div className="empty-title">No bookings found</div>
-          <div className="empty-text">Try adjusting your filters or create a new check-in.</div>
+          <div className="empty-text">No operational check-in records match the current criteria.</div>
         </div>
       ) : (
         <div className="glass-card">
@@ -111,11 +185,11 @@ export default function BookingsPage() {
             <table>
               <thead>
                 <tr>
-                  <th>Reference</th>
+                  <th>Ref</th>
                   <th>Primary Guest</th>
                   <th>Room(s)</th>
-                  <th>Check-In</th>
-                  <th>Check-Out</th>
+                  <th>Check-In Date</th>
+                  <th>Check-Out Date</th>
                   <th>Nights</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -140,7 +214,7 @@ export default function BookingsPage() {
                         <div className="flex gap-xs">
                           <button className="btn btn-ghost btn-sm" onClick={() => router.push(`/bookings/${b._id}`)}>View</button>
                           {b.status === 'checked_in' && (
-                            <button className="btn btn-ghost btn-sm" onClick={() => handleCheckout(b._id, b.bookingReference)}>Check Out</button>
+                            <button className="btn btn-ghost btn-sm" onClick={() => handleCheckoutTrigger(b)}>Check Out</button>
                           )}
                         </div>
                       </td>
@@ -154,15 +228,127 @@ export default function BookingsPage() {
           {/* Pagination */}
           {total > 20 && (
             <div className="flex justify-center gap-sm" style={{ padding: 'var(--sp-md)' }}>
-              <button className="btn btn-ghost btn-sm" disabled={page === 1} onClick={() => { setPage(p => p-1); load(status, search, page-1) }}>← Prev</button>
+              <button className="btn btn-ghost btn-sm" disabled={page === 1} onClick={() => { setPage(p => p - 1); load(status, search, page - 1) }}>← Prev</button>
               <span style={{ padding: '6px 14px', fontSize: 'var(--fs-sm)', color: 'var(--text-mute)' }}>
                 Page {page} of {Math.ceil(total / 20)}
               </span>
-              <button className="btn btn-ghost btn-sm" disabled={page >= Math.ceil(total/20)} onClick={() => { setPage(p => p+1); load(status, search, page+1) }}>Next →</button>
+              <button className="btn btn-ghost btn-sm" disabled={page >= Math.ceil(total / 20)} onClick={() => { setPage(p => p + 1); load(status, search, page + 1) }}>Next →</button>
             </div>
           )}
         </div>
       )}
+
+      {/* Date Mismatch Warning Modal */}
+      <Modal
+        open={showDateMismatchModal}
+        onClose={() => setShowDateMismatchModal(false)}
+        title="Check-Out Date Mismatch"
+        footer={
+          <>
+            <button className="btn btn-ghost text-amber" onClick={() => { setShowDateMismatchModal(false); setShowCheckoutOptionsModal(true) }}>
+              Ignore
+            </button>
+            <button className="btn btn-primary" onClick={handleUpdateCheckoutToToday} disabled={checking}>
+              {checking ? <span className="spinner" /> : null}
+              Update to Today &amp; Proceed
+            </button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 40, textAlign: 'center' }}>⚠️</div>
+          <p style={{ fontSize: 'var(--fs-md)', color: 'var(--text-pri)', textAlign: 'center', fontWeight: 600 }}>
+            Check-out date mismatch detected!
+          </p>
+          <div style={{ background: 'var(--elevated)', padding: 'var(--sp-md)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ color: 'var(--text-mute)' }}>Scheduled Check-Out:</span>
+              <span style={{ fontWeight: 700, color: 'var(--text-pri)' }}>
+                {selectedBooking ? new Date(selectedBooking.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' }) : ''}
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--text-mute)' }}>Today's Date:</span>
+              <span style={{ fontWeight: 700, color: 'var(--accent)' }}>
+                {new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}
+              </span>
+            </div>
+          </div>
+          <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', textAlign: 'center' }}>
+            It is recommended to align the check-out date to today so that guest stay nights are accurately calculated and logged in the system.
+          </p>
+        </div>
+      </Modal>
+
+      {/* Checkout Options Modal */}
+      <Modal
+        open={showCheckoutOptionsModal}
+        onClose={() => setShowCheckoutOptionsModal(false)}
+        title="Choose Check-Out Status"
+        footer={
+          <>
+            <button className="btn btn-ghost" onClick={() => setShowCheckoutOptionsModal(false)}>Cancel</button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={{ fontSize: 'var(--fs-md)', color: 'var(--text-pri)', textAlign: 'center' }}>
+            Please select how the rooms should be marked upon check-out:
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div
+              onClick={() => { if (!checking) handleCheckoutConfirm('serviced') }}
+              style={{
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-md)',
+                padding: 'var(--sp-md)',
+                cursor: checking ? 'not-allowed' : 'pointer',
+                background: 'var(--elevated)',
+                transition: 'border-color var(--t-fast)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                gap: 8
+              }}
+              onMouseEnter={e => { if (!checking) e.currentTarget.style.borderColor = 'var(--accent)' }}
+              onMouseLeave={e => { if (!checking) e.currentTarget.style.borderColor = 'var(--border)' }}
+            >
+              <span style={{ fontSize: 28 }}>🧹</span>
+              <div style={{ fontWeight: 700, color: 'var(--text-pri)' }}>Check Out &amp; Service</div>
+              <p style={{ fontSize: 11, color: 'var(--text-mute)', margin: 0 }}>
+                Rooms are cleaned and marked <strong>Available</strong> for immediate check-in.
+              </p>
+            </div>
+
+            <div
+              onClick={() => { if (!checking) handleCheckoutConfirm('maintenance') }}
+              style={{
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-md)',
+                padding: 'var(--sp-md)',
+                cursor: checking ? 'not-allowed' : 'pointer',
+                background: 'var(--elevated)',
+                transition: 'border-color var(--t-fast)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                gap: 8
+              }}
+              onMouseEnter={e => { if (!checking) e.currentTarget.style.borderColor = 'var(--amber)' }}
+              onMouseLeave={e => { if (!checking) e.currentTarget.style.borderColor = 'var(--border)' }}
+            >
+              <span style={{ fontSize: 28 }}>🔧</span>
+              <div style={{ fontWeight: 700, color: 'var(--text-pri)' }}>Check Out Only</div>
+              <p style={{ fontSize: 11, color: 'var(--text-mute)', margin: 0 }}>
+                Rooms are marked <strong>Under Maintenance</strong> for deep cleaning or repairs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
