@@ -9,6 +9,7 @@ interface Booking {
   bookingReference: string
   checkInTime: string
   checkOutDate: string
+  checkOutTime?: string
   status: string
   nights: number
   guests: Array<{ name: string; isPrimary: boolean }>
@@ -206,7 +207,18 @@ export default function BookingsPage() {
                       <td style={{ fontWeight: 600, color: 'var(--text-pri)' }}>{primary?.name}</td>
                       <td>{rooms}</td>
                       <td style={{ fontSize: 'var(--fs-xs)' }}>{new Date(b.checkInTime).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}</td>
-                      <td style={{ fontSize: 'var(--fs-xs)' }}>{new Date(b.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}</td>
+                      <td style={{ fontSize: 'var(--fs-xs)' }}>
+                        {b.status === 'checked_out' && b.checkOutTime ? (
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span>{new Date(b.checkOutTime).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}</span>
+                            <span style={{ fontSize: '10px', color: 'var(--text-mute)', marginTop: '2px' }}>
+                              {new Date(b.checkOutTime).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        ) : (
+                          new Date(b.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })
+                        )}
+                      </td>
                       <td>{b.nights}</td>
                       <td><span className={`badge ${STATUS_CLASS[b.status] ?? 'badge-muted'}`}>{b.status.replace('_', ' ')}</span></td>
                       <td>

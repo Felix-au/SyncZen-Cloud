@@ -27,6 +27,7 @@ export interface IBooking extends Document {
   bookingReference: string        // e.g. "SS1A2B3C" — unique, human-readable
   checkInTime: Date
   checkOutDate: Date
+  checkOutTime?: Date
   status: 'checked_in' | 'checked_out' | 'cancelled'
   roomIds: mongoose.Types.ObjectId[]
   guests: IGuest[]
@@ -70,6 +71,7 @@ const BookingSchema = new Schema<IBooking>(
     bookingReference: { type: String, required: true, unique: true, uppercase: true, trim: true },
     checkInTime: { type: Date, default: Date.now },
     checkOutDate: { type: Date, required: true },
+    checkOutTime: { type: Date },
     status: {
       type: String,
       enum: ['checked_in', 'checked_out', 'cancelled'],

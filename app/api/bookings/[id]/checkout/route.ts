@@ -64,6 +64,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   // Mark booking as checked out
   booking.status = 'checked_out'
+  booking.checkOutTime = new Date()
   await booking.save()
 
   // Log checkout activity

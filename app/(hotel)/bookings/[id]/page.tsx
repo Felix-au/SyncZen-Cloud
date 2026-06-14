@@ -29,6 +29,7 @@ interface Booking {
   rooms: Room[]
   checkInTime: string
   checkOutDate: string
+  checkOutTime?: string
   nights: number
   customChargePerNight?: number
   notes?: string
@@ -131,7 +132,7 @@ export default function BookingDetailPage() {
         body: JSON.stringify({ action, servicePersonnel: personnelName })
       })
       if (res.ok) {
-        setBooking(prev => prev ? { ...prev, status: 'checked_out' } : null)
+        setBooking(prev => prev ? { ...prev, status: 'checked_out', checkOutTime: new Date().toISOString() } : null)
         setShowCheckoutOptionsModal(false)
         setServicePersonnel('')
       } else {
@@ -183,9 +184,9 @@ export default function BookingDetailPage() {
       : 'SyncZen Cloud'
 
     const guestsListHtml = booking.guests.map((g, i) => `
-      <div class="guest-card" style="display: flex; gap: 20px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 15px; page-break-inside: avoid; background-color: #f9fafb;">
+      <div class="guest-card" style="display: flex; gap: 20px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; max-width: 650px; margin: 0 auto 15px auto; page-break-inside: avoid; break-inside: avoid; background-color: #f9fafb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); box-sizing: border-box; width: 100%;">
         ${g.photoUrl ? `<img src="${g.photoUrl}" alt="${g.name}" style="width: 90px; height: 90px; object-fit: cover; border-radius: 6px; border: 1px solid #d1d5db;" />` : '<div style="width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 40px; background-color: #e5e7eb; border-radius: 6px; border: 1px solid #d1d5db; color: #9ca3af;">👤</div>'}
-        <div style="flex: 1;">
+        <div style="flex: 1; text-align: left;">
           <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #111827; display: flex; align-items: center; gap: 8px;">
             ${g.name} ${g.isPrimary ? '<span style="background-color: #dbeafe; color: #1e40af; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase;">Primary Guest</span>' : ''}
           </h3>
@@ -206,15 +207,19 @@ export default function BookingDetailPage() {
       ? booking.idProofUrls
       : (booking.idProofUrl ? [booking.idProofUrl] : [])
 
+    const gridStyle = idProofUrls.length === 1
+      ? `display: flex; justify-content: center; width: 100%;`
+      : `display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; justify-content: center; align-items: center; width: 100%; max-width: 650px; margin: 0 auto;`
+
     const idDocsHtml = idProofUrls.length > 0
       ? `
-        <div class="section" style="page-break-inside: avoid;">
-          <div class="section-title">ID Document Proofs</div>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+        <div class="section" style="page-break-inside: avoid; break-inside: avoid; text-align: center;">
+          <div class="section-title" style="text-align: center;">ID Document Proofs</div>
+          <div style="${gridStyle}">
             ${idProofUrls.map((url, idx) => `
-              <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; text-align: center; background-color: #f9fafb; page-break-inside: avoid;">
-                <img src="${url}" alt="ID Document Proof ${idx + 1}" style="max-width: 100%; max-height: 220px; object-fit: contain; border-radius: 6px; border: 1px solid #e5e7eb;" />
-                <div style="font-size: 12px; color: #6b7280; margin-top: 6px; font-weight: 600;">Document Proof ${idx + 1}</div>
+              <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #f9fafb; page-break-inside: avoid; break-inside: avoid; box-shadow: 0 1px 3px rgba(0,0,0,0.05); box-sizing: border-box; ${idProofUrls.length === 1 ? 'max-width: 450px; width: 100%; margin: 0 auto;' : 'width: 100%;'}">
+                <img src="${url}" alt="ID Document Proof ${idx + 1}" style="max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 6px; border: 1px solid #e5e7eb;" />
+                <div style="font-size: 12px; color: #6b7280; margin-top: 8px; font-weight: 600; text-align: center;">Document Proof ${idx + 1}</div>
               </div>
             `).join('')}
           </div>
@@ -224,6 +229,10 @@ export default function BookingDetailPage() {
 
     const checkoutDateStr = new Date(booking.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'long' })
     const checkinDateStr = new Date(booking.checkInTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'long', timeStyle: 'short' })
+    
+    const checkoutTimeStr = booking.status === 'checked_out' && booking.checkOutTime
+      ? new Date(booking.checkOutTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'long', timeStyle: 'short' })
+      : null
 
     const totalRoomsPrice = booking.rooms.reduce((s, r) => s + r.pricePerNight, 0)
     const chargePerNight = booking.customChargePerNight ?? totalRoomsPrice
@@ -296,6 +305,7 @@ export default function BookingDetailPage() {
             <div class="grid">
               <div class="field"><span class="label">Check-in Time</span><span class="val">${checkinDateStr}</span></div>
               <div class="field"><span class="label">Check-out Date</span><span class="val">${checkoutDateStr}</span></div>
+              ${checkoutTimeStr ? `<div class="field"><span class="label">Actual Check-out</span><span class="val">${checkoutTimeStr}</span></div>` : ''}
               <div class="field"><span class="label">Nights</span><span class="val">${booking.nights}</span></div>
               <div class="field"><span class="label">Payment Mode</span><span class="val">${booking.paymentMode?.toUpperCase()}</span></div>
               <div class="field"><span class="label">Charge per Night</span><span class="val">₹${chargePerNight.toLocaleString()}</span></div>
@@ -320,9 +330,11 @@ export default function BookingDetailPage() {
 
           ${idDocsHtml}
 
-          <div class="section">
-            <div class="section-title">Guests Details</div>
-            ${guestsListHtml}
+          <div class="section" style="text-align: center;">
+            <div class="section-title" style="text-align: center;">Guests Details</div>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+              ${guestsListHtml}
+            </div>
           </div>
 
           <div class="print-footer">
@@ -385,6 +397,12 @@ export default function BookingDetailPage() {
           </h1>
           <p className="page-subtitle">
             Checked in {new Date(booking.checkInTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })}
+            {booking.status === 'checked_out' && booking.checkOutTime && (
+              <>
+                {' · '}
+                Checked out {new Date(booking.checkOutTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })}
+              </>
+            )}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -520,43 +538,48 @@ export default function BookingDetailPage() {
             <div style={{ padding: 'var(--sp-md) var(--sp-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-sm)' }}>
               {[
                 ['Check-in', new Date(booking.checkInTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })],
-                ['Check-out', (
-                  isEditingDate ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={e => e.stopPropagation()}>
-                      <input
-                        type="date"
-                        className="input"
-                        style={{ padding: '4px 8px', fontSize: 13, width: 140, height: 32, margin: 0 }}
-                        value={tempDate}
-                        min={new Date(booking.checkInTime).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })}
-                        onChange={e => setTempDate(e.target.value)}
-                      />
-                      <button className="btn btn-primary btn-sm" onClick={handleSaveDate} disabled={savingDate} style={{ padding: '4px 10px', height: 32 }}>
-                        {savingDate ? '…' : 'Save'}
-                      </button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => setIsEditingDate(false)} style={{ padding: '4px 10px', height: 32 }}>
-                        ✕
-                      </button>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span>{new Date(booking.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}</span>
-                      {booking.status === 'checked_in' && (
-                        <button
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, padding: '4px 8px', borderRadius: 4 }}
-                          onClick={() => {
-                            setTempDate(new Date(booking.checkOutDate).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }))
-                            setIsEditingDate(true)
-                          }}
-                          className="btn-ghost"
-                          title="Edit check-out date"
-                        >
-                          ✏️
+                ...(booking.status === 'checked_out' && booking.checkOutTime ? [
+                  ['Scheduled Check-out', new Date(booking.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })],
+                  ['Actual Check-out', new Date(booking.checkOutTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })],
+                ] : [
+                  ['Check-out', (
+                    isEditingDate ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={e => e.stopPropagation()}>
+                        <input
+                          type="date"
+                          className="input"
+                          style={{ padding: '4px 8px', fontSize: 13, width: 140, height: 32, margin: 0 }}
+                          value={tempDate}
+                          min={new Date(booking.checkInTime).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })}
+                          onChange={e => setTempDate(e.target.value)}
+                        />
+                        <button className="btn btn-primary btn-sm" onClick={handleSaveDate} disabled={savingDate} style={{ padding: '4px 10px', height: 32 }}>
+                          {savingDate ? '…' : 'Save'}
                         </button>
-                      )}
-                    </div>
-                  )
-                )],
+                        <button className="btn btn-ghost btn-sm" onClick={() => setIsEditingDate(false)} style={{ padding: '4px 10px', height: 32 }}>
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span>{new Date(booking.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}</span>
+                        {booking.status === 'checked_in' && (
+                          <button
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, padding: '4px 8px', borderRadius: 4 }}
+                            onClick={() => {
+                              setTempDate(new Date(booking.checkOutDate).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }))
+                              setIsEditingDate(true)
+                            }}
+                            className="btn-ghost"
+                            title="Edit check-out date"
+                          >
+                            ✏️
+                          </button>
+                        )}
+                      </div>
+                    )
+                  )]
+                ]),
                 ['Nights', booking.nights],
                 ['Charge / night', booking.customChargePerNight
                   ? `₹${booking.customChargePerNight.toLocaleString()} (custom)`
