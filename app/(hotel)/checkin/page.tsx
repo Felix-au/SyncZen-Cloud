@@ -243,9 +243,20 @@ export default function CheckInPage() {
                     {idx > 0 && <button className="btn btn-danger btn-sm" onClick={() => removeGuest(idx)}>Remove</button>}
                   </div>
 
-                  <div className="flex gap-md items-start">
-                    {/* Avatar photo picker */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateAreas: `
+                      "photo name"
+                      "photo phone"
+                      "age   sex"
+                    `,
+                    gridTemplateColumns: '60px 1fr',
+                    gridTemplateRows: 'auto auto auto',
+                    gap: 'var(--sp-md)',
+                    alignItems: 'start',
+                  }}>
+                    {/* Photo — spans rows 1 & 2 */}
+                    <div style={{ gridArea: 'photo', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, paddingTop: 2 }}>
                       <PhotoUpload
                         compact
                         previewUrl={guest.photoDataUri}
@@ -254,30 +265,36 @@ export default function CheckInPage() {
                       <span style={{ fontSize: 10, color: 'var(--text-mute)' }}>Photo</span>
                     </div>
 
-                    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-md)' }}>
-                      <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-                        <label className="input-label">Full Name *</label>
-                        <input className="input" placeholder="Full name" value={guest.name} onChange={e => updateGuest(idx, 'name', e.target.value)} required />
-                      </div>
-                      <div className="input-group">
-                        <label className="input-label">Phone</label>
-                        <input className="input" placeholder="+91 98765 43210" value={guest.phone} onChange={e => updateGuest(idx, 'phone', e.target.value)} />
-                      </div>
-                      <div className="input-group">
-                        <label className="input-label">Age</label>
-                        <input className="input" type="number" min="1" max="120" placeholder="Age" value={guest.age} onChange={e => updateGuest(idx, 'age', e.target.value)} />
-                      </div>
-                      <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-                        <label className="input-label">Sex</label>
-                        <select className="input" value={guest.sex} onChange={e => updateGuest(idx, 'sex', e.target.value)}>
-                          <option value="">Not specified</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
+                    {/* Name — row 1, col 2 */}
+                    <div className="input-group" style={{ gridArea: 'name' }}>
+                      <label className="input-label">Full Name *</label>
+                      <input className="input" placeholder="Full name" value={guest.name} onChange={e => updateGuest(idx, 'name', e.target.value)} required />
+                    </div>
+
+                    {/* Phone — row 2, col 2 */}
+                    <div className="input-group" style={{ gridArea: 'phone' }}>
+                      <label className="input-label">Phone</label>
+                      <input className="input" placeholder="+91 98765 43210" value={guest.phone} onChange={e => updateGuest(idx, 'phone', e.target.value)} />
+                    </div>
+
+                    {/* Age — row 3, col 1 */}
+                    <div className="input-group" style={{ gridArea: 'age' }}>
+                      <label className="input-label">Age</label>
+                      <input className="input" type="number" min="1" max="120" placeholder="Age" value={guest.age} onChange={e => updateGuest(idx, 'age', e.target.value)} />
+                    </div>
+
+                    {/* Sex — row 3, col 2 */}
+                    <div className="input-group" style={{ gridArea: 'sex' }}>
+                      <label className="input-label">Sex</label>
+                      <select className="input" value={guest.sex} onChange={e => updateGuest(idx, 'sex', e.target.value)}>
+                        <option value="">Not specified</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
                     </div>
                   </div>
+
                 </div>
               ))}
 
