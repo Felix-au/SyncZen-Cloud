@@ -19,6 +19,8 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 img,
@@ -190,12 +192,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background var(--t-slow), color var(--t-slow);
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* ── App Shell ──────────────────────────────────────────────── */
 .app-shell {
   display: flex;
   min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* ── Sidebar ────────────────────────────────────────────────── */
@@ -1329,7 +1335,7 @@ tbody tr:last-child td {
     box-shadow: none;
     z-index: 300;
     height: 100dvh;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
   .sidebar.open {
@@ -1361,6 +1367,9 @@ tbody tr:last-child td {
     margin-left: 0;
     padding-top: 56px;
     /* room for the top-bar */
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
   }
 
   /* Show mobile top-bar */
@@ -1411,6 +1420,17 @@ tbody tr:last-child td {
     padding: var(--sp-md);
   }
 
+  .page-container .glass-card,
+  .checkin-content .glass-card,
+  .stat-card {
+    padding: var(--sp-md) !important;
+  }
+
+  .sidebar-footer .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
   .grid-4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1433,6 +1453,17 @@ tbody tr:last-child td {
     padding: var(--sp-md) !important;
   }
 
+  /* Step wizard active label only on mobile */
+  .step-label {
+    display: none;
+  }
+  .step-label.active {
+    display: inline-flex;
+  }
+  .step-bar {
+    padding: var(--sp-md) var(--sp-sm);
+  }
+
   /* Guest card: photo column doubled on mobile too */
   .guest-grid {
     grid-template-columns: 104px 1fr !important;
@@ -1450,9 +1481,10 @@ tbody tr:last-child td {
     justify-content: center;
   }
 
-  /* Room cards: single column */
+  /* Room cards: responsive grid columns */
   .room-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: var(--sp-sm) !important;
   }
 
   /* ── Employees table → card layout on mobile ─────────────── */
