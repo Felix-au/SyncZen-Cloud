@@ -98,30 +98,32 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
       minWidth: 160,
       animation: 'fadeIn 120ms ease',
     }}>
+      {/* Camera — primary action */}
       <button
         type="button"
         onClick={pickCamera}
         style={{
           display: 'flex', alignItems: 'center', gap: 8,
           padding: '9px 12px', borderRadius: 'var(--r-sm)',
-          fontSize: 'var(--fs-sm)', fontWeight: 600,
-          color: 'var(--text-pri)', background: 'none', border: 'none',
+          fontSize: 'var(--fs-sm)', fontWeight: 700,
+          color: 'var(--accent)', background: 'var(--accent-dim)', border: 'none',
           cursor: 'pointer', textAlign: 'left', width: '100%',
           transition: 'background var(--t-fast)',
         }}
-        onMouseEnter={e => (e.currentTarget.style.background = 'var(--elevated)')}
-        onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+        onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-dim)')}
+        onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent-dim)')}
       >
         <span style={{ fontSize: 16 }}>📷</span> Take Photo
       </button>
+      {/* File picker — fallback */}
       <button
         type="button"
         onClick={pickFile}
         style={{
           display: 'flex', alignItems: 'center', gap: 8,
           padding: '9px 12px', borderRadius: 'var(--r-sm)',
-          fontSize: 'var(--fs-sm)', fontWeight: 600,
-          color: 'var(--text-pri)', background: 'none', border: 'none',
+          fontSize: 'var(--fs-sm)', fontWeight: 500,
+          color: 'var(--text-sec)', background: 'none', border: 'none',
           cursor: 'pointer', textAlign: 'left', width: '100%',
           transition: 'background var(--t-fast)',
         }}
