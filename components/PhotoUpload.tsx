@@ -1,62 +1,56 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 
 interface PhotoUploadProps {
   onChange: (dataUri: string, filename: string) => void
   previewUrl?: string
   label?: string
-  /** Compact circular avatar-picker vs full drop-zone */
   compact?: boolean
 }
 
 /**
- * Photo upload component with a camera-or-file-picker choice popover.
+ * Photo upload — clicks open the camera directly.
+ * Falls back to the OS file picker automatically if:
+ *   - No camera device is detected (enumerateDevices)
+ *   - MediaDevices API is unavailable (old browser / HTTP)
  *
- * Clicking the avatar / drop-zone shows a small floating menu:
- *   📷 Take Photo  — opens the device camera (rear on mobile, webcam on desktop)
- *   🖼 Choose File  — opens the OS file picker
- *
- * No separate camera button; the popover dismisses on outside click or Escape.
+ * No manual choice required from the user.
  */
 export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', compact = false }: PhotoUploadProps) {
-  const [open, setOpen]       = useState(false)
   const [dragging, setDragging] = useState(false)
-  const wrapRef   = useRef<HTMLDivElement>(null)
-  const fileRef   = useRef<HTMLInputElement>(null)
   const cameraRef = useRef<HTMLInputElement>(null)
+  const fileRef   = useRef<HTMLInputElement>(null)
 
-  // Close popover on outside click or Escape
-  useEffect(() => {
-    if (!open) return
-    function handleClick(e: MouseEvent) {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false)
+  /** Click handler: prefer camera, cascade to file picker on failure */
+  async function handleClick() {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices()
+      const hasCamera = devices.some(d => d.kind === 'videoinput')
+      if (hasCamera) {
+        cameraRef.current?.click()
+      } else {
+        fileRef.current?.click()
+      }
+    } catch {
+      // MediaDevices unsupported or permission denied before prompt — open file picker
+      fileRef.current?.click()
     }
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    document.addEventListener('keydown', handleKey)
-    return () => {
-      document.removeEventListener('mousedown', handleClick)
-      document.removeEventListener('keydown', handleKey)
-    }
-  }, [open])
+  }
 
-  function handleFile(file: File) {
-    setOpen(false)
+  function processFile(file: File) {
     if (!file.type.startsWith('image/')) return
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = e => {
       const dataUri = e.target?.result as string
       const img = new Image()
       img.onload = () => {
         const canvas = document.createElement('canvas')
-        const maxDim = 1024
+        const max = 1024
         let { width, height } = img
-        if (width > maxDim || height > maxDim) {
-          if (width > height) { height = (height / width) * maxDim; width = maxDim }
-          else { width = (width / height) * maxDim; height = maxDim }
+        if (width > max || height > max) {
+          if (width > height) { height = (height / width) * max; width = max }
+          else { width = (width / height) * max; height = max }
         }
         canvas.width = width; canvas.height = height
         canvas.getContext('2d')!.drawImage(img, 0, 0, width, height)
@@ -67,155 +61,114 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
     reader.readAsDataURL(file)
   }
 
-  function pickFile()   { fileRef.current?.click();   setOpen(false) }
-  function pickCamera() { cameraRef.current?.click(); setOpen(false) }
+  function onInputChange(e: React.ChangeEvent<HTMLInputElement>, isCameraInput: boolean) {
+    const file = e.target.files?.[0]
+    if (file) {
+      processFile(file)
+    } else if (isCameraInput) {
+      // Camera input returned nothing (user cancelled camera or it failed) — open file picker
+      fileRef.current?.click()
+    }
+    e.target.value = '' // reset so same file can be re-selected
+  }
 
-  /* ── Shared hidden inputs ───────────────────────────────────────────── */
-  const hiddenInputs = (
+  const inputs = (
     <>
-      <input ref={fileRef}   type="file" accept="image/*"                      hidden onChange={e => { if (e.target.files?.[0]) { handleFile(e.target.files[0]); e.target.value = '' } }} />
-      <input ref={cameraRef} type="file" accept="image/*" capture="environment" hidden onChange={e => { if (e.target.files?.[0]) { handleFile(e.target.files[0]); e.target.value = '' } }} />
+      {/* Camera-first input */}
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+        onChange={e => onInputChange(e, true)}
+      />
+      {/* Fallback file picker */}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={e => onInputChange(e, false)}
+      />
     </>
   )
 
-  /* ── Shared popover menu ────────────────────────────────────────────── */
-  const popover = open && (
-    <div style={{
-      position: 'absolute',
-      top: compact ? 58 : 'auto',
-      bottom: compact ? 'auto' : 'calc(100% + 8px)',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      zIndex: 200,
-      background: 'var(--surface)',
-      border: '1px solid var(--border-hi)',
-      borderRadius: 'var(--r-md)',
-      boxShadow: 'var(--shadow-lg)',
-      padding: '6px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '2px',
-      minWidth: 160,
-      animation: 'fadeIn 120ms ease',
-    }}>
-      {/* Camera — primary action */}
-      <button
-        type="button"
-        onClick={pickCamera}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          padding: '9px 12px', borderRadius: 'var(--r-sm)',
-          fontSize: 'var(--fs-sm)', fontWeight: 700,
-          color: 'var(--accent)', background: 'var(--accent-dim)', border: 'none',
-          cursor: 'pointer', textAlign: 'left', width: '100%',
-          transition: 'background var(--t-fast)',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-dim)')}
-        onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent-dim)')}
-      >
-        <span style={{ fontSize: 16 }}>📷</span> Take Photo
-      </button>
-      {/* File picker — fallback */}
-      <button
-        type="button"
-        onClick={pickFile}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          padding: '9px 12px', borderRadius: 'var(--r-sm)',
-          fontSize: 'var(--fs-sm)', fontWeight: 500,
-          color: 'var(--text-sec)', background: 'none', border: 'none',
-          cursor: 'pointer', textAlign: 'left', width: '100%',
-          transition: 'background var(--t-fast)',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = 'var(--elevated)')}
-        onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-      >
-        <span style={{ fontSize: 16 }}>🖼️</span> Choose File
-      </button>
-    </div>
-  )
-
-  /* ── Compact mode (circular avatar) ────────────────────────────────── */
+  /* ── Compact circular avatar ────────────────────────────────── */
   if (compact) {
     return (
-      <div ref={wrapRef} style={{ position: 'relative', display: 'inline-block' }}>
+      <div style={{ position: 'relative', display: 'inline-block' }}>
         <button
           type="button"
-          onClick={() => setOpen(o => !o)}
+          onClick={handleClick}
+          title="Tap to take a photo"
           style={{
             position: 'relative',
             width: 52, height: 52,
             borderRadius: '50%',
-            border: `2px ${open ? 'solid' : 'dashed'} ${open ? 'var(--accent)' : 'var(--border-hi)'}`,
+            border: '2px dashed var(--border-hi)',
             background: previewUrl ? 'none' : 'var(--elevated)',
             cursor: 'pointer',
             overflow: 'hidden',
             transition: 'border-color var(--t-base)',
             flexShrink: 0,
           }}
-          onMouseEnter={e => { if (!open) e.currentTarget.style.borderColor = 'var(--accent)' }}
-          onMouseLeave={e => { if (!open) e.currentTarget.style.borderColor = 'var(--border-hi)' }}
-          title="Click to add photo"
+          onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
+          onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-hi)')}
         >
           {previewUrl
             ? <img src={previewUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             : <span style={{ fontSize: 22, opacity: 0.4, lineHeight: '52px' }}>📷</span>
           }
-          {/* Edit overlay when preview exists */}
           {previewUrl && (
             <div style={{
               position: 'absolute', inset: 0,
               background: 'rgba(0,0,0,0.4)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              opacity: 0, transition: 'opacity var(--t-fast)',
-              fontSize: 16, color: '#fff',
+              opacity: 0, transition: 'opacity var(--t-fast)', fontSize: 16, color: '#fff',
             }}
             onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
             onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
             >✎</div>
           )}
         </button>
-        {popover}
-        {hiddenInputs}
+        {inputs}
       </div>
     )
   }
 
-  /* ── Full drop-zone mode ─────────────────────────────────────────────── */
+  /* ── Full drop-zone ─────────────────────────────────────────── */
   return (
-    <div ref={wrapRef} style={{ position: 'relative' }}>
+    <div>
       {label && <div className="input-label" style={{ marginBottom: 8 }}>{label}</div>}
       <div
         className={`photo-drop ${dragging ? 'dragging' : ''}`}
-        style={{ cursor: 'pointer', position: 'relative' }}
-        onClick={() => setOpen(o => !o)}
+        style={{ cursor: 'pointer' }}
+        onClick={handleClick}
         onDragOver={e => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={e => {
           e.preventDefault(); setDragging(false)
           const file = e.dataTransfer.files[0]
-          if (file) handleFile(file)
+          if (file) processFile(file)
         }}
       >
         {previewUrl ? (
           <>
             <img src={previewUrl} alt="Preview" style={{ height: 120, objectFit: 'cover', borderRadius: 8 }} />
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', marginTop: 4 }}>
-              Click to change
-            </span>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', marginTop: 4 }}>Click to retake</span>
           </>
         ) : (
           <>
-            <span className="photo-drop-icon">📸</span>
+            <span className="photo-drop-icon">📷</span>
             <span className="photo-drop-text">
-              Click to add photo or drag &amp; drop
-              <br /><small>JPEG, PNG, WEBP • max 10MB</small>
+              Tap to take a photo
+              <br /><small>Camera opens automatically · drag &amp; drop also works</small>
             </span>
           </>
         )}
       </div>
-      {popover}
-      {hiddenInputs}
+      {inputs}
     </div>
   )
 }
