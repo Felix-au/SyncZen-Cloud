@@ -29,6 +29,8 @@ interface Booking {
   checkInTime: string
   checkOutDate: string
   nights: number
+  customChargePerNight?: number
+  notes?: string
   idProofUrl?: string
   createdBy: { name: string; email: string }
   hotelId: string
@@ -80,8 +82,10 @@ export default function BookingDetailPage() {
     </div>
   )
 
-  const totalValue = booking.rooms.reduce((sum, r) => sum + r.pricePerNight * booking.nights, 0)
-  const primary    = booking.guests.find(g => g.isPrimary) ?? booking.guests[0]
+  const chargePerNight = booking.customChargePerNight
+    ?? booking.rooms.reduce((sum, r) => sum + r.pricePerNight, 0)
+  const totalValue  = chargePerNight * booking.nights
+  const primary     = booking.guests.find(g => g.isPrimary) ?? booking.guests[0]
 
   return (
     <div className="page-container">
@@ -206,10 +210,16 @@ export default function BookingDetailPage() {
             </div>
             <div style={{ padding: 'var(--sp-md) var(--sp-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-sm)' }}>
               {[
-                ['Check-in',    new Date(booking.checkInTime).toLocaleString()],
-                ['Check-out',   new Date(booking.checkOutDate).toLocaleDateString()],
-                ['Nights',      booking.nights],
-                ['Checked in by', booking.createdBy?.name ?? '—'],
+                ['Check-in',      new Date(booking.checkInTime).toLocaleString()],
+                ['Check-out',     new Date(booking.checkOutDate).toLocaleDateString()],
+                ['Nights',        booking.nights],
+                ['Charge / night', booking.customChargePerNight
+                  ? `₹${booking.customChargePerNight.toLocaleString()} (custom)`
+                  : booking.rooms.reduce((s, r) => s + r.pricePerNight, 0) > 0
+                    ? `₹${booking.rooms.reduce((s, r) => s + r.pricePerNight, 0).toLocaleString()}`
+                    : '—'],
+                ['Checked in by',  booking.createdBy?.name ?? '—'],
+                ...(booking.notes ? [['Notes', booking.notes]] : []),
               ].map(([label, value]) => (
                 <div key={label as string} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBlock: 6, borderBottom: '1px solid var(--border)' }}>
                   <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)' }}>{label}</span>
@@ -244,14 +254,17 @@ export default function BookingDetailPage() {
                       {room.roomType}{room.floor != null ? ` · Floor ${room.floor}` : ''}
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 700, color: 'var(--accent)' }}>
-                      ₹{room.pricePerNight.toLocaleString()}/night
+                  {/* Only show room-level rate when no custom charge is set */}
+                  {!booking.customChargePerNight && room.pricePerNight > 0 && (
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontWeight: 700, color: 'var(--accent)' }}>
+                        ₹{room.pricePerNight.toLocaleString()}/night
+                      </div>
+                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>
+                        ₹{(room.pricePerNight * booking.nights).toLocaleString()} total
+                      </div>
                     </div>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>
-                      ₹{(room.pricePerNight * booking.nights).toLocaleString()} total
-                    </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -267,9 +280,14 @@ export default function BookingDetailPage() {
               alignItems: 'center',
               border: '1px solid rgba(59,130,246,0.2)',
             }}>
-              <span style={{ fontWeight: 800, color: 'var(--text-pri)' }}>
-                Grand Total ({booking.nights} night{booking.nights !== 1 ? 's' : ''})
-              </span>
+              <div>
+                <span style={{ fontWeight: 800, color: 'var(--text-pri)' }}>
+                  Grand Total ({booking.nights} night{booking.nights !== 1 ? 's' : ''})
+                </span>
+                {booking.customChargePerNight && (
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--amber)', marginTop: 2 }}>custom rate applied</div>
+                )}
+              </div>
               <span style={{ fontWeight: 900, fontSize: 'var(--fs-xl)', color: 'var(--accent)' }}>
                 ₹{totalValue.toLocaleString()}
               </span>

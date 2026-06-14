@@ -295,7 +295,7 @@ export default function EmployeesPage() {
                 </button>
               </div>
               <span style={{ fontSize: 10, color: 'var(--text-mute)' }}>
-                Use ⟳ Generate for temporary staff who won't use email login.
+                {"Use ⟳ Generate for temporary staff who won't use email login."}
               </span>
             </div>
 

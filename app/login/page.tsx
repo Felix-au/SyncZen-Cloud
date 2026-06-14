@@ -1,12 +1,12 @@
-﻿'use client'
+'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
   const params  = useSearchParams()
   const hint    = params.get('hint')
@@ -118,5 +118,19 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="auth-page">
+        <div className="glass-card auth-card" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+          <span className="spinner" />
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
