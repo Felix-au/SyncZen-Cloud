@@ -14,9 +14,9 @@ interface Guest {
 
 /* ── Wizard Steps ────────────────────────────────────────────── */
 const STEPS = [
-  { id: 'rooms',    label: 'Select Room' },
   { id: 'guests',   label: 'Guest Details' },
   { id: 'idproof',  label: 'ID Proof' },
+  { id: 'rooms',    label: 'Select Room' },
   { id: 'confirm',  label: 'Confirm' },
 ]
 
@@ -26,7 +26,7 @@ export default function CheckInPage() {
   const router = useRouter()
 
   // Step state
-  const [step, setStep] = useState('rooms')
+  const [step, setStep] = useState('guests')
 
   // Step 1 — Room selection
   const [availableRooms, setAvailableRooms] = useState<Room[]>([])
@@ -96,11 +96,11 @@ export default function CheckInPage() {
   function addGuest() { setGuests(gs => [...gs, EMPTY_GUEST()]) }
   function removeGuest(idx: number) { if (guests.length > 1) setGuests(gs => gs.filter((_, i) => i !== idx)) }
 
-  /* ── Validate step 1 ─────────────────────────────────────────── */
-  const step1Valid = selectedRoomIds.length > 0
+  /* ── Validate step 2 (rooms) ─────────────────────────────────── */
+  const step3Valid = selectedRoomIds.length > 0
 
-  /* ── Validate step 2 ─────────────────────────────────────────── */
-  const step2Valid = guests[0]?.name.trim() && checkOutDate
+  /* ── Validate step 1 (guests) ────────────────────────────────── */
+  const step1Valid = guests[0]?.name.trim() && checkOutDate
 
   /* ── Submit check-in ─────────────────────────────────────────── */
   async function handleSubmit() {
@@ -174,7 +174,7 @@ export default function CheckInPage() {
           </div>
           <div className="flex gap-md justify-center">
             <button className="btn btn-ghost" onClick={() => router.push('/bookings')}>View Bookings</button>
-            <button className="btn btn-primary" onClick={() => { setSuccess(null); setStep('rooms'); setSelectedRoomIds([]); setGuests([EMPTY_GUEST()]); setCheckOutDate(''); }}>
+            <button className="btn btn-primary" onClick={() => { setSuccess(null); setStep('guests'); setSelectedRoomIds([]); setGuests([EMPTY_GUEST()]); setCheckOutDate(''); }}>
               ✚ New Check-In
             </button>
           </div>
@@ -193,45 +193,7 @@ export default function CheckInPage() {
 
       <div style={{ flex: 1, padding: 'var(--sp-xl) var(--sp-2xl)', maxWidth: 800, margin: '0 auto', width: '100%' }}>
 
-        {/* ── Step 1: Select Rooms ─────────────────────────────────── */}
-        {step === 'rooms' && (
-          <div className="fade-in">
-            <div className="page-header">
-              <h1 className="page-title">Select Room(s)</h1>
-              <p className="page-subtitle">Choose one or more available rooms for this check-in</p>
-            </div>
-
-            {loadingRooms ? <div className="flex justify-center" style={{ padding: 'var(--sp-3xl)' }}><span className="spinner spinner-lg" /></div>
-            : availableRooms.length === 0 ? (
-              <div className="glass-card empty-state">
-                <span className="empty-icon">🏠</span>
-                <div className="empty-title">No rooms available</div>
-                <div className="empty-text">All rooms are currently occupied or under maintenance.</div>
-              </div>
-            ) : (
-              <div className="room-grid">
-                {availableRooms.map(room => (
-                  <div
-                    key={room._id}
-                    className={`glass-card room-card ${selectedRoomIds.includes(room._id) ? 'selected' : ''}`}
-                    onClick={() => setSelectedRoomIds(ids =>
-                      ids.includes(room._id) ? ids.filter(id => id !== room._id) : [...ids, room._id]
-                    )}
-                  >
-                    <div className="room-number">{room.roomNumber}</div>
-                    <div className="room-type">Floor {room.floor} · {room.roomType}</div>
-                    {room.pricePerNight > 0 && <div className="room-price">₹{room.pricePerNight.toLocaleString()}/night</div>}
-                    {selectedRoomIds.includes(room._id) && (
-                      <div style={{ position: 'absolute', top: 10, right: 10, color: 'var(--accent)', fontSize: 20 }}>✓</div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── Step 2: Guest Details ─────────────────────────────────── */}
+        {/* ── Step 1: Guest Details ─────────────────────────────────── */}
         {step === 'guests' && (
           <div className="fade-in">
             <div className="page-header flex justify-between items-center flex-wrap gap-md">
@@ -347,6 +309,43 @@ export default function CheckInPage() {
             </div>
           </div>
         )}
+        {/* ── Step 3: Select Room ───────────────────────────────────── */}
+        {step === 'rooms' && (
+          <div className="fade-in">
+            <div className="page-header">
+              <h1 className="page-title">Select Room(s)</h1>
+              <p className="page-subtitle">Choose one or more available rooms for this check-in</p>
+            </div>
+
+            {loadingRooms ? <div className="flex justify-center" style={{ padding: 'var(--sp-3xl)' }}><span className="spinner spinner-lg" /></div>
+            : availableRooms.length === 0 ? (
+              <div className="glass-card empty-state">
+                <span className="empty-icon">🏠</span>
+                <div className="empty-title">No rooms available</div>
+                <div className="empty-text">All rooms are currently occupied or under maintenance.</div>
+              </div>
+            ) : (
+              <div className="room-grid">
+                {availableRooms.map(room => (
+                  <div
+                    key={room._id}
+                    className={`glass-card room-card ${selectedRoomIds.includes(room._id) ? 'selected' : ''}`}
+                    onClick={() => setSelectedRoomIds(ids =>
+                      ids.includes(room._id) ? ids.filter(id => id !== room._id) : [...ids, room._id]
+                    )}
+                  >
+                    <div className="room-number">{room.roomNumber}</div>
+                    <div className="room-type">Floor {room.floor} · {room.roomType}</div>
+                    {room.pricePerNight > 0 && <div className="room-price">₹{room.pricePerNight.toLocaleString()}/night</div>}
+                    {selectedRoomIds.includes(room._id) && (
+                      <div style={{ position: 'absolute', top: 10, right: 10, color: 'var(--accent)', fontSize: 20 }}>✓</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ── Step 4: Confirm ──────────────────────────────────────── */}
         {step === 'confirm' && (
@@ -426,8 +425,8 @@ export default function CheckInPage() {
               className="btn btn-primary"
               onClick={goNext}
               disabled={
-                (step === 'rooms'  && !step1Valid) ||
-                (step === 'guests' && !step2Valid)
+                (step === 'guests' && !step1Valid) ||
+                (step === 'rooms'  && !step3Valid)
               }
             >
               Continue →

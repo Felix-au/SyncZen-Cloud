@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import type { Metadata } from 'next'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -42,7 +42,7 @@ export default function LoginPage() {
     <div className="auth-page">
       <div className="glass-card auth-card">
         <div className="auth-logo">
-          <div className="auth-logo-mark">S</div>
+          <Image src="/logo.png" alt="SyncStay" width={52} height={52} style={{ borderRadius: 12, objectFit: 'contain', marginBottom: 8 }} />
           <div className="auth-title">Welcome back</div>
           <div className="auth-subtitle">Sign in to SyncStay</div>
         </div>

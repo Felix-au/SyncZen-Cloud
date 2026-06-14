@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { useTheme } from '@/components/ThemeProvider'
@@ -40,7 +41,7 @@ export function Sidebar() {
     <aside className="sidebar">
       {/* Brand */}
       <div className="sidebar-brand">
-        <div className="auth-logo-mark" style={{ width: 36, height: 36, borderRadius: 8, fontSize: 18 }}>S</div>
+        <Image src="/logo.png" alt="SyncStay" width={36} height={36} style={{ borderRadius: 8, objectFit: 'contain' }} />
         <div>
           <div className="sidebar-name">SyncStay</div>
           <div className="sidebar-tag">{isSuper ? 'Super Admin' : 'Hotel Cloud'}</div>
