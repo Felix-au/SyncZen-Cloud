@@ -1,27 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { uploadToDrive } from '@/lib/drive'
+import { connectDB } from '@/lib/mongodb'
+import Photo from '@/lib/models/Photo'
 import { auth } from '@/lib/auth'
 import { canCheckIn } from '@/lib/roles'
 
 /**
  * POST /api/upload
  *
- * Receives a base64-encoded file from the client, uploads it to Google Drive
- * using the service account, makes it publicly readable, and returns the
- * file ID and direct CDN URL.
+ * Stores a base64-encoded photo in MongoDB and returns a stable URL
+ * via the /api/photos/[id] route.
  *
- * The folder structure in Drive mirrors: hotelId/bookingRef/filename
- * This keeps uploads organised and easy to find/clean up.
+ * Replaces the previous Google Drive integration which failed with
+ * "Service Accounts do not have storage quota".
  *
- * Body:
- * {
- *   data: string,       // base64 data URI, e.g. "data:image/jpeg;base64,/9j/..."
- *   filename: string,   // e.g. "guest1_photo.jpg"
- *   folder: string,     // Drive folder path, e.g. "hotelId/bookingRef"
- * }
- *
- * Response:
- * { fileId: string, url: string }
+ * Body: { data: string, filename: string, folder: string }
+ * Response: { fileId: string, url: string }
  */
 export async function POST(req: NextRequest) {
   const session = await auth()
@@ -35,26 +28,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'data and filename are required' }, { status: 400 })
     }
 
-    // Parse base64 data URI: "data:image/jpeg;base64,<base64data>"
-    const [header, base64] = data.split(',')
-    if (!base64) {
+    // Validate it's a proper data URI
+    if (!data.startsWith('data:')) {
       return NextResponse.json({ error: 'Invalid data URI format' }, { status: 400 })
     }
 
-    const mimeType = header.match(/data:([^;]+)/)?.[1] ?? 'application/octet-stream'
-    const buffer   = Buffer.from(base64, 'base64')
+    const mimeMatch = data.match(/^data:([^;]+);base64,/)
+    const mimeType  = mimeMatch?.[1] ?? 'image/jpeg'
 
-    // Use hotel ID as the root folder to keep uploads scoped per hotel
-    const driveFolder = folder ?? session.user.hotelId ?? 'syncstay-uploads'
+    await connectDB()
 
-    const result = await uploadToDrive(buffer, filename, mimeType, driveFolder)
+    const photo = await Photo.create({
+      hotelId:  session.user.hotelId ?? null,
+      filename: filename.trim(),
+      mimeType,
+      dataUri:  data,
+      folder:   folder ?? '',
+    })
 
-    return NextResponse.json(result, { status: 201 })
+    const fileId = photo._id.toString()
+    const url    = `/api/photos/${fileId}`
+
+    return NextResponse.json({ fileId, url }, { status: 201 })
   } catch (err: any) {
-    console.error('[upload] Drive upload error:', err)
-    return NextResponse.json(
-      { error: 'Upload failed', detail: err.message },
-      { status: 500 }
-    )
+    console.error('[upload] Error:', err?.message ?? err)
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
   }
 }
