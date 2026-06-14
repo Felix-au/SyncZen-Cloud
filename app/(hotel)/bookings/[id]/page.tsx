@@ -79,8 +79,8 @@ export default function BookingDetailPage() {
     if (!booking) return
     
     // Check if scheduled check-out date is today (calendar dates comparison)
-    const todayLocal = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
-    const bookingCheckoutLocal = new Date(booking.checkOutDate).toLocaleDateString('en-CA')
+    const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }) // YYYY-MM-DD
+    const bookingCheckoutLocal = new Date(booking.checkOutDate).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
 
     if (todayLocal !== bookingCheckoutLocal) {
       setShowDateMismatchModal(true)
@@ -91,7 +91,7 @@ export default function BookingDetailPage() {
 
   async function handleUpdateCheckoutToToday() {
     if (!booking) return
-    const todayLocal = new Date().toLocaleDateString('en-CA')
+    const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
     setChecking(true)
     
     try {
@@ -207,7 +207,7 @@ export default function BookingDetailPage() {
             </span>
           </h1>
           <p className="page-subtitle">
-            Checked in {new Date(booking.checkInTime).toLocaleString()}
+            Checked in {new Date(booking.checkInTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })}
           </p>
         </div>
         {booking.status === 'checked_in' && (
@@ -332,7 +332,7 @@ export default function BookingDetailPage() {
             </div>
             <div style={{ padding: 'var(--sp-md) var(--sp-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-sm)' }}>
               {[
-                ['Check-in',      new Date(booking.checkInTime).toLocaleString()],
+                ['Check-in',      new Date(booking.checkInTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })],
                 ['Check-out',     (
                   isEditingDate ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={e => e.stopPropagation()}>
@@ -341,7 +341,7 @@ export default function BookingDetailPage() {
                         className="input"
                         style={{ padding: '4px 8px', fontSize: 13, width: 140, height: 32, margin: 0 }}
                         value={tempDate}
-                        min={new Date(booking.checkInTime).toLocaleDateString('en-CA')}
+                        min={new Date(booking.checkInTime).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })}
                         onChange={e => setTempDate(e.target.value)}
                       />
                       <button className="btn btn-primary btn-sm" onClick={handleSaveDate} disabled={savingDate} style={{ padding: '4px 10px', height: 32 }}>
@@ -353,12 +353,12 @@ export default function BookingDetailPage() {
                     </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span>{new Date(booking.checkOutDate).toLocaleDateString()}</span>
+                      <span>{new Date(booking.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}</span>
                       {booking.status === 'checked_in' && (
                         <button
                           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, padding: '4px 8px', borderRadius: 4 }}
                           onClick={() => {
-                            setTempDate(new Date(booking.checkOutDate).toLocaleDateString('en-CA'))
+                            setTempDate(new Date(booking.checkOutDate).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }))
                             setIsEditingDate(true)
                           }}
                           className="btn-ghost"
@@ -487,13 +487,13 @@ export default function BookingDetailPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span style={{ color: 'var(--text-mute)' }}>Scheduled Check-Out:</span>
               <span style={{ fontWeight: 700, color: 'var(--text-pri)' }}>
-                {booking ? new Date(booking.checkOutDate).toLocaleDateString() : ''}
+                {booking ? new Date(booking.checkOutDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' }) : ''}
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--text-mute)' }}>Today's Date:</span>
               <span style={{ fontWeight: 700, color: 'var(--accent)' }}>
-                {new Date().toLocaleDateString()}
+                {new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' })}
               </span>
             </div>
           </div>

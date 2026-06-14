@@ -141,7 +141,7 @@ export default function LogsPage() {
     if (diffHours < 24) return `${diffHours}h ago`
     if (diffDays === 1) return 'Yesterday'
     if (diffDays < 7) return `${diffDays}d ago`
-    return date.toLocaleDateString()
+    return date.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric' })
   }
 
   return (
@@ -224,7 +224,7 @@ export default function LogsPage() {
                         {getRelativeTime(log.createdAt)}
                       </div>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>
-                        {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(log.createdAt).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true })}
                       </div>
                     </td>
                   </tr>
