@@ -1074,9 +1074,9 @@ tbody tr:last-child td { border-bottom: none; }
     padding: var(--sp-md) !important;
   }
 
-  /* Guest card: photo + name/phone in top, age/sex below */
+  /* Guest card: photo column doubled on mobile too */
   .guest-grid {
-    grid-template-columns: 52px 1fr !important;
+    grid-template-columns: 104px 1fr !important;
     gap: var(--sp-sm) !important;
   }
 

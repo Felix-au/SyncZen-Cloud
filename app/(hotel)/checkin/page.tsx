@@ -250,13 +250,13 @@ export default function CheckInPage() {
                       "photo phone"
                       "age   sex"
                     `,
-                    gridTemplateColumns: '60px 1fr',
+                    gridTemplateColumns: '120px 1fr',
                     gridTemplateRows: 'auto auto auto',
                     gap: 'var(--sp-md)',
                     alignItems: 'start',
                   }}>
-                    {/* Photo — spans rows 1 & 2 */}
-                    <div style={{ gridArea: 'photo', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, paddingTop: 2 }}>
+                    {/* Photo — spans rows 1 & 2, centred vertically */}
+                    <div style={{ gridArea: 'photo', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, alignSelf: 'center' }}>
                       <PhotoUpload
                         compact
                         previewUrl={guest.photoDataUri}
