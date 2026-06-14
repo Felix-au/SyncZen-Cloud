@@ -22,22 +22,57 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handleFile(file: File) {
-    if (!file.type.startsWith('image/')) return
+    console.log("PhotoUpload handleFile:", { name: file.name, type: file.type, size: file.size })
+
+    // Some mobile browsers return an empty string for file.type when capturing directly from the camera.
+    // Since accept restricts the picker to images, we trust the file if its type starts with 'image/',
+    // if it is empty (fallback), or if it matches image file extensions.
+    const isImage = !file.type || file.type.startsWith('image/') || /\.(jpe?g|png|gif|webp|heic|heif)$/i.test(file.name)
+    if (!isImage) {
+      console.warn("PhotoUpload: Rejected file type:", file.type)
+      return
+    }
+
     const reader = new FileReader()
+    reader.onerror = (err) => {
+      console.error("PhotoUpload: FileReader error:", err)
+      alert("Error reading captured image file.")
+    }
     reader.onload = (e) => {
       const dataUri = e.target?.result as string
+      if (!dataUri) {
+        console.error("PhotoUpload: FileReader returned empty result")
+        return
+      }
+
       const img = new Image()
+      img.onerror = (err) => {
+        console.error("PhotoUpload: Image decode error. Format may be unsupported (e.g. raw HEIC).", err)
+        alert("Could not decode image. If you are using an iPhone, try selecting the photo from your library or check your camera format settings (Settings > Camera > Formats > Most Compatible).")
+      }
       img.onload = () => {
-        const canvas = document.createElement('canvas')
-        const maxDim = 1024
-        let { width, height } = img
-        if (width > maxDim || height > maxDim) {
-          if (width > height) { height = (height / width) * maxDim; width = maxDim }
-          else { width = (width / height) * maxDim; height = maxDim }
+        try {
+          const canvas = document.createElement('canvas')
+          const maxDim = 1024
+          let { width, height } = img
+          if (width > maxDim || height > maxDim) {
+            if (width > height) { height = (height / width) * maxDim; width = maxDim }
+            else { width = (width / height) * maxDim; height = maxDim }
+          }
+          canvas.width = width
+          canvas.height = height
+          
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            console.error("PhotoUpload: Failed to get canvas 2D context")
+            return
+          }
+          ctx.drawImage(img, 0, 0, width, height)
+          onChange(canvas.toDataURL('image/jpeg', 0.85), file.name.replace(/\.[^.]+$/, '.jpg'))
+          console.log("PhotoUpload: Successfully processed image")
+        } catch (err) {
+          console.error("PhotoUpload: Canvas drawing error:", err)
         }
-        canvas.width = width; canvas.height = height
-        canvas.getContext('2d')!.drawImage(img, 0, 0, width, height)
-        onChange(canvas.toDataURL('image/jpeg', 0.85), file.name.replace(/\.[^.]+$/, '.jpg'))
       }
       img.src = dataUri
     }
@@ -51,7 +86,7 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
     <input
       ref={inputRef}
       type="file"
-      accept="image/*"
+      accept="image/jpeg,image/png,image/gif,image/webp"
       capture="environment"
       style={{
         position: 'absolute',
