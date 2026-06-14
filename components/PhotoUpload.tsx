@@ -69,7 +69,7 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
         onClick={trigger}
         style={{
           position: 'relative',
-          width: 52, height: 52,
+          width: 72, height: 72,
           borderRadius: '50%',
           border: '2px dashed var(--border-hi)',
           background: previewUrl ? 'none' : 'var(--elevated)',
@@ -84,7 +84,7 @@ export function PhotoUpload({ onChange, previewUrl, label = 'Upload Photo', comp
       >
         {previewUrl
           ? <img src={previewUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <span style={{ fontSize: 22, opacity: 0.4, lineHeight: '52px' }}>📷</span>
+          : <span style={{ fontSize: 30, opacity: 0.4, lineHeight: '72px' }}>📷</span>
         }
         {/* Subtle edit overlay when a photo is already set */}
         {previewUrl && (

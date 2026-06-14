@@ -256,13 +256,12 @@ export default function CheckInPage() {
                     alignItems: 'start',
                   }}>
                     {/* Photo — spans rows 1 & 2, centred vertically */}
-                    <div style={{ gridArea: 'photo', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, alignSelf: 'center' }}>
+                    <div style={{ gridArea: 'photo', display: 'flex', alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
                       <PhotoUpload
                         compact
                         previewUrl={guest.photoDataUri}
                         onChange={(uri, name) => setGuestPhoto(idx, uri, name)}
                       />
-                      <span style={{ fontSize: 10, color: 'var(--text-mute)' }}>Photo</span>
                     </div>
 
                     {/* Name — row 1, col 2 */}

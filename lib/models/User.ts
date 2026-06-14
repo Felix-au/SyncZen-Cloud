@@ -10,7 +10,7 @@ import mongoose, { Schema, Document, Model, models } from 'mongoose'
 
 export interface IUser extends Document {
   email: string
-  username: string
+  username?: string
   passwordHash: string
   name: string
   role: 'super_admin' | 'hotel_owner' | 'manager' | 'staff'
@@ -33,10 +33,10 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, required: true, trim: true },
     username: {
       type: String,
-      unique: true,
-      sparse: true,   // Only index docs that actually have a username (legacy docs won't collide)
       lowercase: true,
       trim: true,
+      sparse: true,
+      index: { unique: true, sparse: true },
     },
     role: {
       type: String,
@@ -49,6 +49,17 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true }
 )
 
-// Prevent model recompilation during hot reloads
-const User: Model<IUser> = models.User ?? mongoose.model<IUser>('User', UserSchema)
+/**
+ * In Next.js dev mode, hot-reload keeps mongoose.models alive but may have
+ * compiled the schema BEFORE the username field was added — so the cached
+ * model silently strips the username field on every User.create().
+ *
+ * Fix: delete the cached model so this file always re-registers it with
+ * the CURRENT schema. Safe because mongoose.connection persists separately.
+ */
+if (models['User']) {
+  delete (models as Record<string, unknown>)['User']
+}
+
+const User: Model<IUser> = mongoose.model<IUser>('User', UserSchema)
 export default User

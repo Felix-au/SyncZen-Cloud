@@ -10,7 +10,8 @@
 
 /* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { overflow-x: hidden; }
 img, svg { display: block; max-width: 100%; }
 button { cursor: pointer; font: inherit; border: none; background: none; }
 a { text-decoration: none; color: inherit; }
