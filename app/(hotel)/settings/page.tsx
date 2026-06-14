@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { PhotoUpload } from '@/components/PhotoUpload'
 
 interface Hotel {
@@ -13,7 +12,6 @@ interface Hotel {
 export default function SettingsPage() {
   const { data: session, update } = useSession()
   const role = session?.user?.role
-  const router = useRouter()
 
   const [hotel, setHotel]     = useState<Hotel | null>(null)
   const [loading, setLoading] = useState(true)
@@ -110,11 +108,11 @@ export default function SettingsPage() {
     setCreating(false)
     if (!res.ok) { setCreateError(data.error ?? 'Failed to create hotel'); return }
 
-    // Refresh the JWT so session.user.hotelId and role reflect the new hotel_owner status,
-    // then bust the RSC cache and navigate to the dashboard.
+    // Refresh the JWT so session.user.hotelId and role reflect the new hotel_owner status.
+    // Use a hard navigation (not router.push) so the browser does a full reload and picks
+    // up the new session cookie — client-side navigation keeps the stale session in memory.
     await update()
-    router.refresh()
-    router.push('/dashboard')
+    window.location.href = '/dashboard'
   }
 
   if (loading) return <div className="page-container flex justify-center" style={{ paddingTop: 80 }}><span className="spinner spinner-lg" /></div>
