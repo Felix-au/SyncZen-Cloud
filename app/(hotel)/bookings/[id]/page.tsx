@@ -576,6 +576,8 @@ export default function BookingDetailPage() {
                           value={tempDate}
                           min={new Date(booking.checkInTime).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })}
                           onChange={e => setTempDate(e.target.value)}
+                          onClick={e => (e.target as any).showPicker?.()}
+                          onFocus={e => (e.target as any).showPicker?.()}
                         />
                         <button className="btn btn-primary btn-sm" onClick={handleSaveDate} disabled={savingDate} style={{ padding: '4px 10px', height: 32 }}>
                           {savingDate ? '…' : 'Save'}
