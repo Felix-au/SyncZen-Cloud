@@ -56,6 +56,7 @@ select {
   --surface-2: #f5f7fc;
   --elevated: #eef2f9;
   --overlay: rgba(240, 244, 250, 0.88);
+  --loader-bg: #ffffff;
 
   /* Glass effect layers */
   --glass-bg: rgba(255, 255, 255, 0.7);
@@ -142,6 +143,7 @@ select {
   --surface-2: #222222;
   --elevated: #2a2a2a;
   --overlay: rgba(10, 10, 10, 0.85);
+  --loader-bg: #000000;
 
   /* Glass effect layers */
   --glass-bg: rgba(28, 28, 28, 0.65);

@@ -166,7 +166,7 @@ export default function LandingPage() {
             style={{
               position: 'fixed',
               inset: 0,
-              background: '#000000',
+              background: 'var(--loader-bg)',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
