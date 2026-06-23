@@ -912,10 +912,10 @@ export default function LandingPage() {
           {/* Left Panel: Logo, Branding, Description (Centered) */}
           <motion.div
             className="left-panel"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 80 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.2 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
+            transition={{ duration: 1.0, ease: 'easeOut' }}
           >
             <Image
               src="/logo.png"
@@ -1003,10 +1003,10 @@ export default function LandingPage() {
                 <motion.div
                   key={idx}
                   className="square-card"
-                  initial={{ opacity: 0, scale: 0.9, x: idx % 2 === 0 ? -100 : 100, y: idx < 2 ? -100 : 100 }}
+                  initial={{ opacity: 0, scale: 0.9, x: idx % 2 === 0 ? -250 : 250, y: idx < 2 ? -250 : 250 }}
                   whileInView={{ opacity: 1, scale: 1, x: 0, y: 0 }}
                   viewport={{ once: false, amount: 0.2 }}
-                  transition={{ type: 'spring', stiffness: 100, damping: 15, delay: 0.08 * idx }}
+                  transition={{ type: 'spring', stiffness: 50, damping: 14, delay: 0.1 * idx }}
                   whileHover={{ scale: 1.03 }}
                 >
                   {/* Large absolute background watermark icon */}
@@ -1076,10 +1076,10 @@ export default function LandingPage() {
               perspective: 1200,
               transformStyle: 'preserve-3d',
             }}
-            initial={{ rotateY: 90, opacity: 0 }}
-            whileInView={{ rotateY: 0, opacity: 1 }}
-            viewport={{ once: false, amount: 0.2 }}
-            transition={{ duration: 0.8, type: 'spring', stiffness: 60, damping: 15 }}
+            initial={{ x: 300, rotateY: 45, opacity: 0 }}
+            whileInView={{ x: 0, rotateY: 0, opacity: 1 }}
+            viewport={{ once: false, amount: 0.1 }}
+            transition={{ duration: 1.1, type: 'spring', stiffness: 45, damping: 14 }}
           >
             <div className="lp-preview-card">
               <div className="lp-preview-bar">
@@ -1616,10 +1616,10 @@ export default function LandingPage() {
               <TiltCard
                 key={idx}
                 className="lp-flow-card"
-                initial={{ opacity: 0, y: -50 }}
+                initial={{ opacity: 0, y: -150 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{ type: 'spring', stiffness: 100, damping: 15, delay: 0.12 * idx }}
+                viewport={{ once: false, amount: 0.1 }}
+                transition={{ type: 'spring', stiffness: 40, damping: 12, delay: 0.22 * idx }}
                 whileHover={{ scale: 1.03 }}
               >
                 <div className="lp-flow-num">{step.num}</div>
@@ -1683,10 +1683,10 @@ export default function LandingPage() {
                 <TiltCard
                   key={idx}
                   className={`lp-role-card ${role.class}`}
-                  initial={{ opacity: 0, rotateY: 90 }}
+                  initial={{ opacity: 0, rotateY: 720 }}
                   whileInView={{ opacity: 1, rotateY: 0 }}
                   viewport={{ once: false, amount: 0.2 }}
-                  transition={{ duration: 0.8, delay: 0.15 * idx, type: 'spring', stiffness: 80, damping: 15 }}
+                  transition={{ duration: 1.0, ease: 'easeOut', delay: 0.1 * idx }}
                   whileHover={{ scale: 1.02 }}
                 >
                   <div className="lp-role-header">
@@ -1714,15 +1714,17 @@ export default function LandingPage() {
       {/* Slide 4: Comparison Section */}
       <section id="why-synczen" className="slide-section">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
+          initial={{ opacity: 0, y: 150, rotateX: 25 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: false, amount: 0.15 }}
+          transition={{ type: 'spring', stiffness: 45, damping: 13 }}
           style={{
             width: '100%',
             maxWidth: '1200px',
             padding: '0 var(--sp-2xl)',
             zIndex: 10,
+            perspective: 1200,
+            transformStyle: 'preserve-3d',
           }}
         >
           <div
@@ -1734,6 +1736,7 @@ export default function LandingPage() {
               display: 'flex',
               flexDirection: 'column',
               gap: 'var(--sp-lg)',
+              transformStyle: 'preserve-3d',
             }}
           >
             <div style={{ textAlign: 'center' }}>
@@ -1764,10 +1767,10 @@ export default function LandingPage() {
                   ].map((row, idx) => (
                     <motion.tr
                       key={idx}
-                      initial={{ opacity: 0, x: -50 }}
-                      whileInView={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, scale: 0.85, y: 20 }}
+                      whileInView={{ opacity: 1, scale: 1, y: 0 }}
                       viewport={{ once: false, amount: 0.1 }}
-                      transition={{ duration: 0.5, delay: 0.1 * idx }}
+                      transition={{ type: 'spring', stiffness: 80, damping: 12, delay: 0.12 * idx }}
                       style={{ borderBottom: idx < 4 ? '1px solid var(--border)' : 'none' }}
                     >
                       <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{row.name}</td>
@@ -1819,78 +1822,91 @@ export default function LandingPage() {
             <div className="local-promo-grid">
               {/* Left Column: Local App Information */}
               <motion.div
-                initial={{ opacity: 0, x: -100 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{ duration: 0.7, type: 'spring', stiffness: 80, damping: 15 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: false, amount: 0.1 }}
+                transition={{ duration: 0.4 }}
               >
-                <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-sec)', lineHeight: 1.6, margin: '0 0 var(--sp-md) 0' }}>
+                <motion.p
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: false, amount: 0.1 }}
+                  transition={{ type: 'spring', stiffness: 60, damping: 14 }}
+                  style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-sec)', lineHeight: 1.6, margin: '0 0 var(--sp-md) 0' }}
+                >
                   Need to run without internet dependency or external servers? <strong>SyncZen Local</strong> is a fully standalone offline workstation. It couples a native Electron desktop app with companion mobile check-in assistant devices over your local WiFi network.
-                </p>
+                </motion.p>
 
                 <div className="local-feature-list">
-                  <div className="local-feature-item">
-                    <div className="local-feature-icon">🖥️</div>
-                    <div className="local-feature-text">
-                      <div className="local-feature-heading">Electron Desktop Workstation</div>
-                      Central hotel operations cockpit running a React + Vite frontend with an in-memory WebAssembly SQLite database (sql.js) and auto-backups directly to disk (synczen.db).
-                    </div>
-                  </div>
-                  <div className="local-feature-item">
-                    <div className="local-feature-icon">📱</div>
-                    <div className="local-feature-text">
-                      <div className="local-feature-heading">Mobile Companion Assistant</div>
-                      Expo React Native mobile app. Devices connect securely by scanning a pairing QR code generated on the desktop, enabling camera photo capturing of guest profiles.
-                    </div>
-                  </div>
-                  <div className="local-feature-item">
-                    <div className="local-feature-icon">🔄</div>
-                    <div className="local-feature-text">
-                      <div className="local-feature-heading">Offline Sync Engine</div>
-                      Buffers bookings and guest photos as base64 in AsyncStorage when devices are out of WiFi range. A background loop automatically flushes the queue every 15 seconds once online.
-                    </div>
-                  </div>
-                  <div className="local-feature-item">
-                    <div className="local-feature-icon">🛡️</div>
-                    <div className="local-feature-text">
-                      <div className="local-feature-heading">Complete Data Privacy</div>
-                      All guest records, documents, and logs remain strictly on your own hardware inside your building. Zero cloud hosting, zero data leaks, and zero downtime.
-                    </div>
-                  </div>
+                  {[
+                    { icon: '🖥️', title: 'Electron Desktop Workstation', desc: 'Central hotel operations cockpit running a React + Vite frontend with an in-memory WebAssembly SQLite database (sql.js) and auto-backups directly to disk (synczen.db).' },
+                    { icon: '📱', title: 'Mobile Companion Assistant', desc: 'Expo React Native mobile app. Devices connect securely by scanning a pairing QR code generated on the desktop, enabling camera photo capturing of guest profiles.' },
+                    { icon: '🔄', title: 'Offline Sync Engine', desc: 'Buffers bookings and guest photos as base64 in AsyncStorage when devices are out of WiFi range. A background loop automatically flushes the queue every 15 seconds once online.' },
+                    { icon: '🛡️', title: 'Complete Data Privacy', desc: 'All guest records, documents, and logs remain strictly on your own hardware inside your building. Zero cloud hosting, zero data leaks, and zero downtime.' }
+                  ].map((item, idx) => (
+                    <motion.div
+                      key={idx}
+                      className="local-feature-item"
+                      initial={{ opacity: 0, x: -80, scale: 0.9 }}
+                      whileInView={{ opacity: 1, x: 0, scale: 1 }}
+                      viewport={{ once: false, amount: 0.1 }}
+                      transition={{ type: 'spring', stiffness: 60, damping: 13, delay: 0.1 * idx }}
+                    >
+                      <div className="local-feature-icon">{item.icon}</div>
+                      <div className="local-feature-text">
+                        <div className="local-feature-heading">{item.title}</div>
+                        {item.desc}
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </motion.div>
 
               {/* Right Column: Connection Workflow and Download Actions */}
               <motion.div
                 style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}
-                initial={{ opacity: 0, x: 100 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{ duration: 0.7, type: 'spring', stiffness: 80, damping: 15 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: false, amount: 0.1 }}
+                transition={{ duration: 0.4 }}
               >
                 <div className="local-flow-steps">
-                  <h4 style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, margin: '0 0 var(--sp-xs) 0', color: 'var(--text-pri)' }}>
+                  <motion.h4
+                    initial={{ opacity: 0, x: 50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: false, amount: 0.1 }}
+                    transition={{ type: 'spring', stiffness: 60, damping: 14 }}
+                    style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, margin: '0 0 var(--sp-xs) 0', color: 'var(--text-pri)' }}
+                  >
                     How Local Mode Works:
-                  </h4>
-                  <div className="local-flow-step">
-                    <div className="local-flow-number">1</div>
-                    <span>Launch desktop app to boot SQLite & LAN Express API</span>
-                  </div>
-                  <div className="local-flow-step">
-                    <div className="local-flow-number">2</div>
-                    <span>Scan Pairing QR Code from mobile app to pair devices</span>
-                  </div>
-                  <div className="local-flow-step">
-                    <div className="local-flow-number">3</div>
-                    <span>Perform check-ins on either the desktop or the mobile</span>
-                  </div>
-                  <div className="local-flow-step">
-                    <div className="local-flow-number">4</div>
-                    <span>Bookings automatically queue and sync to desktop database</span>
-                  </div>
+                  </motion.h4>
+                  {[
+                    'Launch desktop app to boot SQLite & LAN Express API',
+                    'Scan Pairing QR Code from mobile app to pair devices',
+                    'Perform check-ins on either the desktop or the mobile',
+                    'Bookings automatically queue and sync to desktop database'
+                  ].map((step, idx) => (
+                    <motion.div
+                      key={idx}
+                      className="local-flow-step"
+                      initial={{ opacity: 0, x: 80, scale: 0.95 }}
+                      whileInView={{ opacity: 1, x: 0, scale: 1 }}
+                      viewport={{ once: false, amount: 0.1 }}
+                      transition={{ type: 'spring', stiffness: 60, damping: 13, delay: 0.08 * idx }}
+                    >
+                      <div className="local-flow-number">{idx + 1}</div>
+                      <span>{step}</span>
+                    </motion.div>
+                  ))}
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-sm)', marginTop: 'var(--sp-xs)' }}>
+                <motion.div
+                  style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-sm)', marginTop: 'var(--sp-xs)' }}
+                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: false, amount: 0.1 }}
+                  transition={{ type: 'spring', stiffness: 50, damping: 11, delay: 0.35 }}
+                >
                   <a
                     href="https://github.com/Felix-au/SyncZen-Local/releases/latest"
                     target="_blank"
@@ -1909,7 +1925,7 @@ export default function LandingPage() {
                   >
                     📄 View GitHub Repository
                   </a>
-                </div>
+                </motion.div>
               </motion.div>
             </div>
           </div>
