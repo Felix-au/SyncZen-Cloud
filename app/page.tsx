@@ -67,7 +67,8 @@ export default function LandingPage() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+      const scrollEl = document.scrollingElement || document.documentElement
+      const scrollTop = scrollEl.scrollTop || 0
       if (scrollTop > 50) {
         setIsScrolled(true)
       } else {
@@ -200,6 +201,8 @@ export default function LandingPage() {
           display: flex;
           flex-direction: column;
           justify-content: center;
+          align-items: center;
+          text-align: center;
           gap: var(--sp-sm);
           transition: all var(--t-base);
         }
@@ -742,12 +745,11 @@ export default function LandingPage() {
 
         /* Scroll Snap Slide System */
         @media (min-width: 901px) {
-          html {
+          html, body {
             scroll-snap-type: y mandatory;
             scroll-behavior: smooth;
-          }
-          body {
-            min-height: 100vh;
+            overflow-y: scroll;
+            height: 100%;
           }
           .slide-section {
             height: 100vh;
@@ -994,7 +996,7 @@ export default function LandingPage() {
                   desc: 'Weighted role-based permissions restrict staff actions and protect hotel properties.',
                 },
               ].map((feat, idx) => (
-                <TiltCard
+                <motion.div
                   key={idx}
                   className="square-card"
                   initial={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -1026,7 +1028,7 @@ export default function LandingPage() {
                   <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-sec)', margin: 0, lineHeight: 1.4, zIndex: 2 }}>
                     {feat.desc}
                   </p>
-                </TiltCard>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -1740,11 +1742,12 @@ export default function LandingPage() {
                 {[
                   { name: 'Check-In Logging', legacy: 'Complex multi-tab forms', modern: 'Smooth 4-step check-in wizard' },
                   { name: 'Guest Avatars', legacy: 'Manual scanners / local files', modern: 'In-browser crop & secure CDN storage' },
-                  { name: 'Interface Customization', legacy: 'Rigid Windows 98 layouts', modern: 'Glassmorphic Dark / Light mode' },
-                  { name: 'Audit Trails', legacy: 'None or hidden inside flat logs', modern: 'Dynamic employee activity logger' },
+                  { name: 'Device Pairing', legacy: 'Complex physical serial-port wiring', modern: 'Pair mobile companion via QR code' },
+                  { name: 'Audit Trails', legacy: 'None or hidden inside flat logs', modern: 'Dynamic and easy to access activity logger' },
                   { name: 'Room Rates', legacy: 'Locked standard price tags', modern: 'On-the-fly custom overrides' },
+                  { name: 'Offline Operations', legacy: 'Complete downtime on connection loss', modern: 'Seamless local workstation fallback' },
                 ].map((row, idx) => (
-                  <tr key={idx} style={{ borderBottom: idx < 4 ? '1px solid var(--border)' : 'none' }}>
+                  <tr key={idx} style={{ borderBottom: idx < 5 ? '1px solid var(--border)' : 'none' }}>
                     <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{row.name}</td>
                     <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', textAlign: 'center' }}>{row.legacy}</td>
                     <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-pri)', fontWeight: 700, textAlign: 'center' }}>
@@ -1780,10 +1783,12 @@ export default function LandingPage() {
           <div className="local-promo-grid">
             {/* Left Column: Local App Information */}
             <div>
-              <span className="local-promo-badge">Offline & Local-First</span>
-              <h2 className="local-promo-title">
-                SyncZen Local Station
-              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                <span className="local-promo-badge">Offline & Local-First</span>
+                <h2 className="local-promo-title">
+                  SyncZen Local Station
+                </h2>
+              </div>
               <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-sec)', lineHeight: 1.6, margin: '0 0 var(--sp-md) 0' }}>
                 Need to run without internet dependency or external servers? <strong>SyncZen Local</strong> is a fully standalone offline workstation. It couples a native Electron desktop app with companion mobile check-in assistant devices over your local WiFi network.
               </p>
