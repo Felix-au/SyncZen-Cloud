@@ -913,7 +913,8 @@ export default function LandingPage() {
           <motion.div
             className="left-panel"
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             <Image
@@ -1002,9 +1003,10 @@ export default function LandingPage() {
                 <motion.div
                   key={idx}
                   className="square-card"
-                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 * idx, ease: 'easeOut' }}
+                  initial={{ opacity: 0, scale: 0.9, x: idx % 2 === 0 ? -100 : 100, y: idx < 2 ? -100 : 100 }}
+                  whileInView={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                  viewport={{ once: false, amount: 0.2 }}
+                  transition={{ type: 'spring', stiffness: 100, damping: 15, delay: 0.08 * idx }}
                   whileHover={{ scale: 1.03 }}
                 >
                   {/* Large absolute background watermark icon */}
@@ -1067,7 +1069,18 @@ export default function LandingPage() {
           </div>
 
           {/* Dashboard preview card */}
-          <div className="lp-hero-preview" style={{ marginTop: '0px' }}>
+          <motion.div
+            className="lp-hero-preview"
+            style={{
+              marginTop: '0px',
+              perspective: 1200,
+              transformStyle: 'preserve-3d',
+            }}
+            initial={{ rotateY: 90, opacity: 0 }}
+            whileInView={{ rotateY: 0, opacity: 1 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.8, type: 'spring', stiffness: 60, damping: 15 }}
+          >
             <div className="lp-preview-card">
               <div className="lp-preview-bar">
                 <span className="lp-preview-dot red" />
@@ -1548,7 +1561,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </section>
 
@@ -1603,10 +1616,10 @@ export default function LandingPage() {
               <TiltCard
                 key={idx}
                 className="lp-flow-card"
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: -50 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 * idx }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ type: 'spring', stiffness: 100, damping: 15, delay: 0.12 * idx }}
                 whileHover={{ scale: 1.03 }}
               >
                 <div className="lp-flow-num">{step.num}</div>
@@ -1670,10 +1683,10 @@ export default function LandingPage() {
                 <TiltCard
                   key={idx}
                   className={`lp-role-card ${role.class}`}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.1 * idx }}
+                  initial={{ opacity: 0, rotateY: 90 }}
+                  whileInView={{ opacity: 1, rotateY: 0 }}
+                  viewport={{ once: false, amount: 0.2 }}
+                  transition={{ duration: 0.8, delay: 0.15 * idx, type: 'spring', stiffness: 80, damping: 15 }}
                   whileHover={{ scale: 1.02 }}
                 >
                   <div className="lp-role-header">
@@ -1744,18 +1757,25 @@ export default function LandingPage() {
                 <tbody>
                   {[
                     { name: 'Check-In Logging', legacy: 'Complex multi-tab forms', modern: 'Smooth 4-step check-in wizard' },
-                    { name: 'Guest Avatars', legacy: 'Manual scanners / local files', modern: 'In-browser crop & secure CDN storage' },
+                    { name: 'Guest Avatars', legacy: 'Manual scanners / local files', modern: 'In-browser tools & secure CDN storage' },
                     { name: 'Data Analytics', legacy: 'Static end-of-day printouts', modern: 'Live interactive dashboard analytics' },
                     { name: 'Audit Trails', legacy: 'None or hidden inside flat logs', modern: 'Dynamic and easy to access activity logger' },
                     { name: 'Room Rates', legacy: 'Locked standard price tags', modern: 'On-the-fly custom overrides' },
                   ].map((row, idx) => (
-                    <tr key={idx} style={{ borderBottom: idx < 5 ? '1px solid var(--border)' : 'none' }}>
+                    <motion.tr
+                      key={idx}
+                      initial={{ opacity: 0, x: -50 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: false, amount: 0.1 }}
+                      transition={{ duration: 0.5, delay: 0.1 * idx }}
+                      style={{ borderBottom: idx < 4 ? '1px solid var(--border)' : 'none' }}
+                    >
                       <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{row.name}</td>
                       <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', textAlign: 'center' }}>{row.legacy}</td>
                       <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-pri)', fontWeight: 700, textAlign: 'center' }}>
                         {row.modern}
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
@@ -1767,10 +1787,10 @@ export default function LandingPage() {
       {/* Slide 5: SyncZen Local Segment (Premium Two-Column Layout) */}
       <section id="local-station" className="slide-section">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: false, amount: 0.1 }}
+          transition={{ duration: 0.4 }}
           style={{ width: '100%', maxWidth: '1200px', padding: '0 var(--sp-2xl)', zIndex: 10 }}
         >
           <div
@@ -1783,16 +1803,27 @@ export default function LandingPage() {
             }}
           >
             {/* Centered Header Block (outside the grid to center relative to the entire card) */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 'var(--sp-lg)' }}>
+            <motion.div
+              initial={{ opacity: 0, y: -40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.6, type: 'spring', stiffness: 100, damping: 15 }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 'var(--sp-lg)' }}
+            >
               <span className="local-promo-badge">Offline & Local-First</span>
               <h2 className="local-promo-title" style={{ marginBottom: 0 }}>
                 SyncZen Local Station
               </h2>
-            </div>
+            </motion.div>
 
             <div className="local-promo-grid">
               {/* Left Column: Local App Information */}
-              <div>
+              <motion.div
+                initial={{ opacity: 0, x: -100 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.7, type: 'spring', stiffness: 80, damping: 15 }}
+              >
                 <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-sec)', lineHeight: 1.6, margin: '0 0 var(--sp-md) 0' }}>
                   Need to run without internet dependency or external servers? <strong>SyncZen Local</strong> is a fully standalone offline workstation. It couples a native Electron desktop app with companion mobile check-in assistant devices over your local WiFi network.
                 </p>
@@ -1827,10 +1858,16 @@ export default function LandingPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Right Column: Connection Workflow and Download Actions */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}>
+              <motion.div
+                style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}
+                initial={{ opacity: 0, x: 100 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.7, type: 'spring', stiffness: 80, damping: 15 }}
+              >
                 <div className="local-flow-steps">
                   <h4 style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, margin: '0 0 var(--sp-xs) 0', color: 'var(--text-pri)' }}>
                     How Local Mode Works:
@@ -1873,7 +1910,7 @@ export default function LandingPage() {
                     📄 View GitHub Repository
                   </a>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </motion.div>
