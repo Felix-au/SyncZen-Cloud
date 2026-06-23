@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
@@ -61,8 +61,25 @@ function TiltCard({ children, className, style, max = 10, ...props }: TiltCardPr
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState('Dashboard')
   const { theme, toggle } = useTheme()
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      const scrollTop = target ? (target.scrollTop ?? window.scrollY) : window.scrollY;
+      if (scrollTop > 50) {
+        setIsScrolled(true)
+      } else {
+        setIsScrolled(false)
+      }
+    }
+    window.addEventListener('scroll', handleScroll, true)
+    return () => window.removeEventListener('scroll', handleScroll, true)
+  }, [])
+
   return (
     <div
+      className="scroll-container"
       style={{
         minHeight: '100vh',
         background: 'var(--bg)',
@@ -78,7 +95,7 @@ export default function LandingPage() {
       {/* Background Floating Orbs (Animations for Premium Feel) */}
       <div
         style={{
-          position: 'absolute',
+          position: 'fixed',
           top: '-10%',
           left: '10%',
           width: '600px',
@@ -92,7 +109,7 @@ export default function LandingPage() {
       />
       <div
         style={{
-          position: 'absolute',
+          position: 'fixed',
           bottom: '-10%',
           right: '5%',
           width: '550px',
@@ -722,10 +739,104 @@ export default function LandingPage() {
           border-color: var(--border-hi);
           transform: scale(1.05);
         }
+
+        /* Scroll Snap Slide System */
+        @media (min-width: 901px) {
+          .scroll-container {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+          }
+          .slide-section {
+            height: 100vh;
+            min-height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+          }
+        }
+        @media (max-width: 900px) {
+          .scroll-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+          }
+          .slide-section {
+            width: 100%;
+            padding: var(--sp-xl) var(--sp-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+        }
+
+        /* Fixed and Floating Scroll-Adaptive Header */
+        .landing-nav {
+          position: fixed;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          max-width: 100%;
+          padding: var(--sp-md) var(--sp-2xl);
+          z-index: 100;
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          background: var(--glass-bg);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border-bottom: 1px solid var(--glass-border);
+        }
+
+        .landing-nav.scrolled-pill {
+          top: 18px;
+          width: calc(100% - 32px);
+          max-width: 860px;
+          border-radius: var(--r-full);
+          padding: 8px var(--sp-xl);
+          border: 1px solid var(--border-hi);
+          box-shadow: var(--shadow-lg), 0 10px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .nav-links {
+          display: flex;
+          align-items: center;
+          gap: var(--sp-md);
+        }
+
+        .nav-link {
+          font-size: var(--fs-xs);
+          font-weight: 700;
+          color: var(--text-sec);
+          padding: 6px 12px;
+          border-radius: var(--r-full);
+          transition: all var(--t-fast);
+          cursor: pointer;
+        }
+
+        .nav-link:hover {
+          color: var(--text-pri);
+          background: var(--glass-hover);
+        }
+
+        @media (max-width: 860px) {
+          .nav-links {
+            display: none; /* Hide link row on small screens */
+          }
+        }
       `}</style>
 
       {/* Navigation Header */}
-      <header className="landing-nav">
+      <header className={`landing-nav ${isScrolled ? 'scrolled-pill' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-sm)' }}>
           <Image
             src="/logo.png"
@@ -736,13 +847,39 @@ export default function LandingPage() {
           />
           <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px' }}>SyncZen</span>
         </div>
+
+        {/* Navigation links to jump to slides */}
+        <nav className="nav-links">
+          <a href="#dashboard-demo" className="nav-link">Demo Dashboard</a>
+          <a href="#features" className="nav-link">Features</a>
+          <a href="#why-synczen" className="nav-link">Why SyncZen</a>
+          <a href="#local-station" className="nav-link">SyncZen Local</a>
+        </nav>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-sm)' }}>
           <button
             onClick={toggle}
             className="btn-theme-toggle"
             aria-label="Toggle theme"
+            style={{ borderRadius: 'var(--r-full)', padding: '8px' }}
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            )}
           </button>
           <Link href="/login" className="btn btn-primary btn-sm" id="nav-btn-get-started" style={{ padding: '8px 18px' }}>
             Get Started
@@ -750,8 +887,8 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Split Layout Container */}
-      <main style={{ flex: 1, display: 'flex', alignItems: 'center', padding: 'var(--sp-md) 0' }}>
+      {/* Hero Split Layout Container (Slide 1) */}
+      <main id="hero" className="slide-section">
         <div className="main-container">
 
           {/* Left Panel: Logo, Branding, Description (Centered) */}
@@ -882,24 +1019,24 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Dashboard Preview Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.7 }}
-        style={{
-          width: '100%',
-          maxWidth: '1200px',
-          margin: 'var(--sp-2xl) auto 0 auto',
-          padding: '0 var(--sp-2xl)',
-          zIndex: 10,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 'var(--sp-sm)',
-        }}
-      >
+      {/* Slide 2: Dashboard Preview Section */}
+      <section id="dashboard-demo" className="slide-section">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.7 }}
+          style={{
+            width: '100%',
+            maxWidth: '1200px',
+            padding: '0 var(--sp-2xl)',
+            zIndex: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 'var(--sp-sm)',
+          }}
+        >
         <div style={{ textAlign: 'center', marginBottom: 'var(--sp-xs)' }}>
           <h2 style={{ fontSize: 'var(--fs-xl)', fontWeight: 900, letterSpacing: '-0.5px' }}>
             Interactive Operations Dashboard
@@ -1122,30 +1259,35 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </motion.section>
+        </motion.div>
+      </section>
 
-      {/* Guest Check-In Flow Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6 }}
-        style={{
-          width: '100%',
-          maxWidth: '1200px',
-          margin: 'var(--sp-2xl) auto 0 auto',
-          padding: '0 var(--sp-2xl)',
-          zIndex: 10,
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 'var(--sp-lg)' }}>
-          <h2 style={{ fontSize: 'var(--fs-xl)', fontWeight: 900, letterSpacing: '-0.5px' }}>
-            Guest Check-In Flow
-          </h2>
-          <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', margin: 'var(--sp-xs) 0 0 0' }}>
-            From Arrival to Allocated Room in 4 Steps
-          </p>
-        </div>
+      {/* Slide 3: Guest Check-In Flow & Access Control */}
+      <section id="features" className="slide-section" style={{ zIndex: 10 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
+          style={{
+            width: '100%',
+            maxWidth: '1200px',
+            padding: '0 var(--sp-2xl)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--sp-md)',
+            height: '100%',
+            justifyContent: 'center'
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: 'var(--sp-xs)' }}>
+            <h2 style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px' }}>
+              Guest Check-In Flow
+            </h2>
+            <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: 'var(--sp-xs) 0 0 0' }}>
+              From Arrival to Allocated Room in 4 Steps
+            </p>
+          </div>
 
         <div className="lp-flow-grid">
           {[
@@ -1186,32 +1328,19 @@ export default function LandingPage() {
             </TiltCard>
           ))}
         </div>
-      </motion.section>
 
-      {/* Access Control Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6 }}
-        style={{
-          width: '100%',
-          maxWidth: '1200px',
-          margin: 'var(--sp-2xl) auto 0 auto',
-          padding: '0 var(--sp-2xl)',
-          zIndex: 10,
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 'var(--sp-lg)' }}>
-          <h2 style={{ fontSize: 'var(--fs-xl)', fontWeight: 900, letterSpacing: '-0.5px' }}>
-            Access Control
-          </h2>
-          <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', margin: 'var(--sp-xs) 0 0 0' }}>
-            The Right Access for the Right Person
-          </p>
-        </div>
+        {/* Access Control segment */}
+        <div style={{ marginTop: 'var(--sp-xs)' }}>
+          <div style={{ textAlign: 'center', marginBottom: 'var(--sp-xs)' }}>
+            <h2 style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px' }}>
+              Access Control
+            </h2>
+            <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: 'var(--sp-xs) 0 0 0' }}>
+              The Right Access for the Right Person
+            </p>
+          </div>
 
-        <div className="lp-roles-grid">
+          <div className="lp-roles-grid">
           {[
             {
               role: 'Hotel Owner',
@@ -1277,22 +1406,24 @@ export default function LandingPage() {
             </TiltCard>
           ))}
         </div>
-      </motion.section>
+        </div>
+        </motion.div>
+      </section>
 
-      {/* Comparison Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6 }}
-        style={{
-          width: '100%',
-          maxWidth: '1200px',
-          margin: 'var(--sp-2xl) auto 0 auto',
-          padding: '0 var(--sp-2xl)',
-          zIndex: 10,
-        }}
-      >
+      {/* Slide 4: Comparison Section */}
+      <section id="why-synczen" className="slide-section">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
+          style={{
+            width: '100%',
+            maxWidth: '1200px',
+            padding: '0 var(--sp-2xl)',
+            zIndex: 10,
+          }}
+        >
         <div
           className="glass-card"
           style={{
@@ -1342,17 +1473,18 @@ export default function LandingPage() {
             </table>
           </div>
         </div>
-      </motion.section>
+        </motion.div>
+      </section>
 
-      {/* SyncZen Local Segment (Premium Two-Column Layout) */}
-      <motion.section
-        className="local-promo-section"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6 }}
-        style={{ maxWidth: '1200px', margin: 'var(--sp-2xl) auto 0 auto', padding: '0 var(--sp-2xl)' }}
-      >
+      {/* Slide 5: SyncZen Local Segment (Premium Two-Column Layout) */}
+      <section id="local-station" className="slide-section">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
+          style={{ width: '100%', maxWidth: '1200px', padding: '0 var(--sp-2xl)', zIndex: 10 }}
+        >
         <TiltCard
           className="glass-card"
           max={3}
@@ -1453,29 +1585,30 @@ export default function LandingPage() {
             </div>
           </div>
         </TiltCard>
-      </motion.section>
 
-      {/* Footer */}
-      <footer
-        style={{
-          borderTop: '1px solid var(--border)',
-          width: '100%',
-          textAlign: 'center',
-          padding: 'var(--sp-xl) var(--sp-lg)',
-          marginTop: 'auto',
-          zIndex: 10,
-        }}
-      >
-        <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: 0 }}>
-          © {new Date().getFullYear()} SyncZen Cloud. All rights reserved.
-        </p>
-        <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: '4px 0 0 0' }}>
-          Author: <strong>Felix-au</strong> (Harshit Soni)
-        </p>
-        <p style={{ textAlign: 'center', marginTop: 'var(--sp-md)' }}>
-          <sub>Built for hoteliers who value visual aesthetics and operational speed.</sub>
-        </p>
-      </footer>
+        {/* Footer */}
+        <footer
+          style={{
+            borderTop: '1px solid var(--border)',
+            width: '100%',
+            textAlign: 'center',
+            padding: 'var(--sp-md) var(--sp-lg)',
+            marginTop: 'var(--sp-lg)',
+            zIndex: 10,
+          }}
+        >
+          <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: 0 }}>
+            © {new Date().getFullYear()} SyncZen Cloud. All rights reserved.
+          </p>
+          <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: '4px 0 0 0' }}>
+            Author: <strong>Felix-au</strong> (Harshit Soni)
+          </p>
+          <p style={{ textAlign: 'center', marginTop: 'var(--sp-sm)' }}>
+            <sub>Built for hoteliers who value visual aesthetics and operational speed.</sub>
+          </p>
+        </footer>
+        </motion.div>
+      </section>
     </div>
   )
 }

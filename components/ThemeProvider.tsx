@@ -24,13 +24,13 @@ const ThemeContext = createContext<ThemeContextValue>({
  * Persists preference in localStorage under 'synczen-theme'.
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light')
+  const [theme, setTheme] = useState<Theme>('dark')
 
   // Load stored preference on mount (client only)
   useEffect(() => {
     const stored = localStorage.getItem('synczen-theme') as Theme | null
-    // If user has no stored preference, default to light
-    const initial: Theme = stored ?? 'light'
+    // If user has no stored preference, default to dark
+    const initial: Theme = stored ?? 'dark'
     apply(initial)
     setTheme(initial)
   }, [])

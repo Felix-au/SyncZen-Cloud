@@ -23,6 +23,23 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var stored = localStorage.getItem('synczen-theme');
+                var theme = stored || 'dark';
+                if (theme === 'dark') {
+                  document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                  document.documentElement.removeAttribute('data-theme');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={inter.variable}>
         <Providers>{children}</Providers>
       </body>
