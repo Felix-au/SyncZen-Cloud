@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /$
+Allow: /login
+Allow: /register
+Allow: /join
+Disallow: /dashboard
+Disallow: /rooms
+Disallow: /checkin
+Disallow: /bookings
+Disallow: /employees
+Disallow: /settings
+Disallow: /logs
+Disallow: /super
+Disallow: /api/
+
+Sitemap: https://synczen.cloud/sitemap.xml

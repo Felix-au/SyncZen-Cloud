@@ -15,9 +15,46 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: { default: 'SyncZen', template: '%s | SyncZen' },
+  metadataBase: new URL('https://synczen.cloud'),
+  title: { default: 'SyncZen - Cloud Hotel Check-In & PMS', template: '%s | SyncZen' },
   description: 'Cloud hotel check-in and management platform — register hotels, manage rooms, and process guest check-ins from anywhere.',
-  keywords: ['hotel management', 'check-in', 'hotel software', 'SyncZen'],
+  keywords: ['hotel management', 'check-in', 'hotel software', 'SyncZen', 'property management system', 'PMS', 'hotel booking'],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://synczen.cloud',
+    title: 'SyncZen - Cloud Hotel Check-In & PMS',
+    description: 'Cloud hotel check-in and management platform — register hotels, manage rooms, and process guest check-ins from anywhere.',
+    siteName: 'SyncZen',
+    images: [
+      {
+        url: '/logo.png',
+        width: 512,
+        height: 512,
+        alt: 'SyncZen Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'SyncZen - Cloud Hotel Check-In & PMS',
+    description: 'Cloud hotel check-in and management platform — register hotels, manage rooms, and process guest check-ins from anywhere.',
+    images: ['/logo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  verification: {
+    google: 'googlecb84d8cd2044b548',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
