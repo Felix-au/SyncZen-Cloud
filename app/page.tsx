@@ -2383,7 +2383,7 @@ export default function LandingPage() {
                     ) : (
                       'Send Message'
                     )}
-                  </button>
+                  </motion.button>
                 </form>
               </div>
             </motion.div>
