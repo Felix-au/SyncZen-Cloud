@@ -62,10 +62,13 @@ export default function LandingPage() {
   const [activeTab, setActiveTab] = useState('Dashboard')
   const { theme, toggle } = useTheme()
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isDemoCheckInOpen, setIsDemoCheckInOpen] = useState(false)
+  const [demoStep, setDemoStep] = useState(1)
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+      if (scrollTop > 50) {
         setIsScrolled(true)
       } else {
         setIsScrolled(false)
@@ -785,6 +788,9 @@ export default function LandingPage() {
           backdrop-filter: blur(20px) saturate(180%);
           -webkit-backdrop-filter: blur(20px) saturate(180%);
           border-bottom: 1px solid var(--glass-border);
+          border-bottom-left-radius: 20px;
+          border-bottom-right-radius: 20px;
+          box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15), 0 2px 10px rgba(99, 102, 241, 0.1); /* blueish glow */
         }
 
         .landing-nav.scrolled-pill {
@@ -794,7 +800,7 @@ export default function LandingPage() {
           border-radius: var(--r-full);
           padding: 8px var(--sp-xl);
           border: 1px solid var(--border-hi);
-          box-shadow: var(--shadow-lg), 0 10px 40px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 10px 40px rgba(59, 130, 246, 0.25), 0 4px 20px rgba(99, 102, 241, 0.15); /* blueish glow */
         }
 
         .nav-links {
@@ -1063,14 +1069,170 @@ export default function LandingPage() {
               </div>
               <div className="lp-mini-main" style={{ position: 'relative' }}>
                 <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.15 }}
-                    style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}
-                  >
+                  {isDemoCheckInOpen ? (
+                    <motion.div
+                      key="demo-wizard"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.18 }}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        background: 'var(--bg)',
+                        zIndex: 20,
+                        padding: 'var(--sp-md)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--sp-xs)',
+                        overflowY: 'auto'
+                      }}
+                    >
+                      {/* Header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--accent)' }}>Demo Check-In Wizard</span>
+                        <button
+                          onClick={() => setIsDemoCheckInOpen(false)}
+                          style={{ background: 'transparent', border: 'none', color: 'var(--text-mute)', fontSize: '12px', cursor: 'pointer' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      {/* Step Indicators */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold', padding: '2px 0' }}>
+                        {['Guest', 'ID Proof', 'Room', 'Confirm'].map((name, i) => (
+                          <span key={i} style={{ color: demoStep === i + 1 ? 'var(--accent)' : 'inherit' }}>
+                            {i + 1}. {name}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Step Contents */}
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '10px', marginTop: '4px' }}>
+                        {demoStep === 1 && (
+                          <>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--surface)', padding: '6px', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)' }}>
+                              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)', overflow: 'hidden' }}>
+                                <img src="/logo.png" alt="Guest Avatar" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: 'bold', fontSize: '10px' }}>Rohan Verma</div>
+                                <div style={{ fontSize: '8px', color: 'var(--text-sec)' }}>+91 98765 43210</div>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>GUEST NAME</label>
+                              <input type="text" readOnly value="Rohan Verma" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                            </div>
+                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>PHONE NUMBER</label>
+                              <input type="text" readOnly value="+91 98765 43210" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                            </div>
+                          </>
+                        )}
+
+                        {demoStep === 2 && (
+                          <>
+                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>DOCUMENT TYPE</label>
+                              <input type="text" readOnly value="Aadhaar Card" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                            </div>
+                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>ID NUMBER</label>
+                              <input type="text" readOnly value="1234 5678 9012" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                            </div>
+                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>ID ATTACHMENT</label>
+                              <div style={{ height: '32px', border: '1px dashed var(--border-hi)', borderRadius: '2px', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px', background: 'rgba(0,0,0,0.02)' }}>
+                                <img src="/logo.png" alt="ID Document" style={{ height: '100%', objectFit: 'contain' }} />
+                                <span style={{ fontSize: '8px', color: 'var(--text-mute)' }}>aadhaar_rohan_verma.jpg</span>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {demoStep === 3 && (
+                          <>
+                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>SELECTED ROOM</label>
+                              <input type="text" readOnly value="Room 202" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                            </div>
+                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>ROOM TYPE</label>
+                              <input type="text" readOnly value="Suite" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                            </div>
+                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>NIGHTLY RATE</label>
+                              <input type="text" readOnly value="₹12,000 / night" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                            </div>
+                          </>
+                        )}
+
+                        {demoStep === 4 && (
+                          <>
+                            <div style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px solid var(--border)', padding: '6px', borderRadius: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                                <span style={{ color: 'var(--text-mute)' }}>Guest:</span>
+                                <span style={{ fontWeight: 'bold' }}>Rohan Verma</span>
+                              </div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                                <span style={{ color: 'var(--text-mute)' }}>ID:</span>
+                                <span>Aadhaar (Verified)</span>
+                              </div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                                <span style={{ color: 'var(--text-mute)' }}>Room:</span>
+                                <span style={{ fontWeight: 'bold' }}>Room 202 (Suite)</span>
+                              </div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                                <span style={{ color: 'var(--text-mute)' }}>Total:</span>
+                                <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>₹12,000 / night</span>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center', marginTop: '2px' }}>
+                              <span style={{ fontSize: '9px' }}>✅ Ready to Check-In</span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '4px', borderTop: '1px solid var(--border)' }}>
+                        <button
+                          onClick={() => {
+                            if (demoStep > 1) setDemoStep(demoStep - 1);
+                            else setIsDemoCheckInOpen(false);
+                          }}
+                          style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '2px', padding: '3px 8px', fontSize: '9px', cursor: 'pointer', color: 'var(--text-sec)' }}
+                        >
+                          {demoStep === 1 ? 'Cancel' : 'Back'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (demoStep < 4) {
+                              setDemoStep(demoStep + 1);
+                            } else {
+                              setIsDemoCheckInOpen(false);
+                            }
+                          }}
+                          style={{ background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '2px', padding: '3px 8px', fontSize: '9px', fontWeight: 'bold', cursor: 'pointer' }}
+                        >
+                          {demoStep === 4 ? 'Confirm Booking' : 'Next'}
+                        </button>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key={activeTab}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.15 }}
+                      style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}
+                    >
                     {activeTab === 'Dashboard' && (
                       <>
                         <div className="lp-mini-stats-row">
@@ -1144,9 +1306,29 @@ export default function LandingPage() {
 
                     {activeTab === 'Bookings' && (
                       <>
-                        <div className="lp-mini-table-head">
+                        <div className="lp-mini-table-head" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                           <span>Active Bookings</span>
-                          <span className="lp-mini-badge">Live</span>
+                          <button
+                            onClick={() => {
+                              setIsDemoCheckInOpen(true);
+                              setDemoStep(1);
+                            }}
+                            style={{
+                              background: 'var(--accent)',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '4px',
+                              padding: '2px 8px',
+                              fontSize: '8px',
+                              fontWeight: 'bold',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              height: '16px',
+                            }}
+                          >
+                            + Add Booking
+                          </button>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           {[
@@ -1252,7 +1434,8 @@ export default function LandingPage() {
                       </>
                     )}
                   </motion.div>
-                </AnimatePresence>
+                )}
+              </AnimatePresence>
               </div>
             </div>
           </div>
@@ -1583,6 +1766,45 @@ export default function LandingPage() {
         </TiltCard>
         </motion.div>
       </section>
+
+      {/* Persistent Footer */}
+      <footer
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '8px 24px',
+          background: 'var(--glass-bg)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderTop: '1px solid var(--glass-border)',
+          zIndex: 99,
+          fontSize: '11px',
+          color: 'var(--text-sec)',
+        }}
+      >
+        <div style={{ textAlign: 'center', fontWeight: 600 }}>
+          © 2026 SyncZen. All rights reserved.
+        </div>
+        <div style={{ position: 'absolute', right: '24px', display: 'flex', alignItems: 'center' }}>
+          <a
+            href="https://github.com/Felix-au/Sync-Zen-Cloud"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'inherit', textDecoration: 'none', fontWeight: 700 }}
+            className="footer-link"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </footer>
     </div>
   )
 }
