@@ -2224,7 +2224,7 @@ export default function LandingPage() {
             </div>
             <div style={{ position: 'absolute', right: '24px', display: 'flex', alignItems: 'center' }}>
               <a
-                href="https://github.com/Felix-au/Sync-Zen-Cloud"
+                href="https://github.com/Felix-au/SyncZen-Cloud"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'inherit', textDecoration: 'none', fontWeight: 700 }}

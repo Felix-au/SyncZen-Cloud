@@ -257,7 +257,7 @@ When a guest check-in is submitted, rooms are processed via the reservation engi
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Felix-au/Sync-Zen-Cloud.git
+git clone https://github.com/Felix-au/SyncZen-Cloud.git
 cd Sync-Zen-Cloud
 
 # 2. Install dependencies
