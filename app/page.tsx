@@ -2245,13 +2245,13 @@ export default function LandingPage() {
           {/* Slide 6: Contact & Support (Premium Support Form) */}
           <section id="contact-support" className="slide-section">
             <motion.div
-              initial={{ opacity: 0, scale: 0.8, rotateX: -20, rotateY: 45 }}
+              initial={{ opacity: 0, scale: 0.8, rotateX: 20, rotateY: -45 }}
               whileInView={{ opacity: 1, scale: 1.0, rotateX: 0, rotateY: 0 }}
               viewport={{ once: false, amount: 0.1 }}
               transition={{ duration: 1.2, type: 'spring', stiffness: 40, damping: 12 }}
               style={{
                 width: '100%',
-                maxWidth: '650px',
+                maxWidth: '520px',
                 padding: '0 var(--sp-2xl)',
                 zIndex: 10,
                 perspective: 1200,
@@ -2261,14 +2261,14 @@ export default function LandingPage() {
               <div
                 className="glass-card"
                 style={{
-                  padding: 'var(--sp-xl)',
+                  padding: 'var(--sp-lg)',
                   borderRadius: 'var(--r-xl)',
                   border: '1px solid rgba(124, 58, 237, 0.15)',
                   background: 'linear-gradient(135deg, var(--surface) 0%, rgba(124, 58, 237, 0.03) 100%)',
                 }}
               >
                 {/* Centered Header Block */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 'var(--sp-lg)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 'var(--sp-md)' }}>
                   <h2 className="local-promo-title" style={{ marginBottom: '8px' }}>
                     Contact Support
                   </h2>
