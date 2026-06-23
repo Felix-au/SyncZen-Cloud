@@ -92,11 +92,11 @@ const rolesGridVariants = {
 const roleCardVariants = {
   hidden: { opacity: 0, rotateY: 0 },
   visible: {
-    opacity: 1,
+    opacity: [0, 1, 1, 1],
     rotateY: [0, 45, 45, 0],
     transition: {
-      duration: 2.0,
-      times: [0, 0.2, 0.8, 1.0],
+      duration: 1.5,
+      times: [0, 0.25, 0.75, 1.0],
       ease: "easeInOut"
     }
   }
@@ -1841,11 +1841,18 @@ export default function LandingPage() {
       {/* Slide 5: SyncZen Local Segment (Premium Two-Column Layout) */}
       <section id="local-station" className="slide-section">
         <motion.div
-          initial={{ opacity: 0, x: 300 }}
-          whileInView={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, scale: 0.8, rotateX: -20, rotateY: 45 }}
+          whileInView={{ opacity: 1, scale: 1.0, rotateX: 0, rotateY: 0 }}
           viewport={{ once: false, amount: 0.1 }}
-          transition={{ type: 'spring', stiffness: 40, damping: 13 }}
-          style={{ width: '100%', maxWidth: '1200px', padding: '0 var(--sp-2xl)', zIndex: 10 }}
+          transition={{ duration: 1.2, type: 'spring', stiffness: 40, damping: 12 }}
+          style={{
+            width: '100%',
+            maxWidth: '1200px',
+            padding: '0 var(--sp-2xl)',
+            zIndex: 10,
+            perspective: 1200,
+            transformStyle: 'preserve-3d',
+          }}
         >
           <div
             className="glass-card"
