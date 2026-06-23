@@ -2251,7 +2251,7 @@ export default function LandingPage() {
               transition={{ duration: 0.85, type: 'spring', stiffness: 50, damping: 14 }}
               style={{
                 width: '100%',
-                maxWidth: '520px',
+                maxWidth: '600px',
                 padding: '0 var(--sp-2xl)',
                 zIndex: 10,
               }}
