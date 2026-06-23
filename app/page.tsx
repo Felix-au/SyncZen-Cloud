@@ -58,6 +58,50 @@ function TiltCard({ children, className, style, max = 10, ...props }: TiltCardPr
   )
 }
 
+const flowGridVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.25
+    }
+  }
+}
+
+const flowCardVariants = {
+  hidden: { opacity: 0, y: -350 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 25,
+      damping: 12
+    }
+  }
+}
+
+const rolesGridVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+}
+
+const roleCardVariants = {
+  hidden: { opacity: 0, rotateY: 45 },
+  visible: {
+    opacity: 1,
+    rotateY: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 50,
+      damping: 12
+    }
+  }
+}
+
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState('Dashboard')
   const { theme, toggle } = useTheme()
@@ -1076,10 +1120,10 @@ export default function LandingPage() {
               perspective: 1200,
               transformStyle: 'preserve-3d',
             }}
-            initial={{ x: 300, rotateY: 45, opacity: 0 }}
-            whileInView={{ x: 0, rotateY: 0, opacity: 1 }}
+            initial={{ opacity: 0, scale: 0.8, rotateX: 20, rotateY: -45 }}
+            whileInView={{ opacity: 1, scale: 1.0, rotateX: 0, rotateY: 0 }}
             viewport={{ once: false, amount: 0.1 }}
-            transition={{ duration: 1.1, type: 'spring', stiffness: 45, damping: 14 }}
+            transition={{ duration: 1.2, type: 'spring', stiffness: 40, damping: 12 }}
           >
             <div className="lp-preview-card">
               <div className="lp-preview-bar">
@@ -1590,7 +1634,14 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="lp-flow-grid" style={{ marginTop: '8px' }}>
+          <motion.div
+            className="lp-flow-grid"
+            style={{ marginTop: '8px' }}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.05 }}
+            variants={flowGridVariants}
+          >
             {[
               {
                 num: '01',
@@ -1616,10 +1667,7 @@ export default function LandingPage() {
               <TiltCard
                 key={idx}
                 className="lp-flow-card"
-                initial={{ opacity: 0, y: -150 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.1 }}
-                transition={{ type: 'spring', stiffness: 40, damping: 12, delay: 0.22 * idx }}
+                variants={flowCardVariants}
                 whileHover={{ scale: 1.03 }}
               >
                 <div className="lp-flow-num">{step.num}</div>
@@ -1628,7 +1676,7 @@ export default function LandingPage() {
                 {idx < 3 && <div className="lp-flow-arrow">→</div>}
               </TiltCard>
             ))}
-          </div>
+          </motion.div>
 
           {/* Access Control segment */}
           <div style={{ marginTop: '12px' }}>
@@ -1641,7 +1689,14 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="lp-roles-grid" style={{ marginTop: '8px' }}>
+            <motion.div
+              className="lp-roles-grid"
+              style={{ marginTop: '8px' }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.05 }}
+              variants={rolesGridVariants}
+            >
               {[
                 {
                   role: 'Hotel Owner',
@@ -1683,10 +1738,7 @@ export default function LandingPage() {
                 <TiltCard
                   key={idx}
                   className={`lp-role-card ${role.class}`}
-                  initial={{ opacity: 0, rotateY: 720 }}
-                  whileInView={{ opacity: 1, rotateY: 0 }}
-                  viewport={{ once: false, amount: 0.2 }}
-                  transition={{ duration: 1.0, ease: 'easeOut', delay: 0.1 * idx }}
+                  variants={roleCardVariants}
                   whileHover={{ scale: 1.02 }}
                 >
                   <div className="lp-role-header">
@@ -1706,7 +1758,7 @@ export default function LandingPage() {
                   </ul>
                 </TiltCard>
               ))}
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </section>
@@ -1714,17 +1766,15 @@ export default function LandingPage() {
       {/* Slide 4: Comparison Section */}
       <section id="why-synczen" className="slide-section">
         <motion.div
-          initial={{ opacity: 0, y: 150, rotateX: 25 }}
-          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          initial={{ opacity: 0, x: -300 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: false, amount: 0.15 }}
-          transition={{ type: 'spring', stiffness: 45, damping: 13 }}
+          transition={{ type: 'spring', stiffness: 40, damping: 13 }}
           style={{
             width: '100%',
             maxWidth: '1200px',
             padding: '0 var(--sp-2xl)',
             zIndex: 10,
-            perspective: 1200,
-            transformStyle: 'preserve-3d',
           }}
         >
           <div
@@ -1770,7 +1820,7 @@ export default function LandingPage() {
                       initial={{ opacity: 0, scale: 0.85, y: 20 }}
                       whileInView={{ opacity: 1, scale: 1, y: 0 }}
                       viewport={{ once: false, amount: 0.1 }}
-                      transition={{ type: 'spring', stiffness: 80, damping: 12, delay: 0.12 * idx }}
+                      transition={{ type: 'spring', stiffness: 80, damping: 12, delay: 0.4 + 0.12 * idx }}
                       style={{ borderBottom: idx < 4 ? '1px solid var(--border)' : 'none' }}
                     >
                       <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{row.name}</td>
@@ -1790,10 +1840,10 @@ export default function LandingPage() {
       {/* Slide 5: SyncZen Local Segment (Premium Two-Column Layout) */}
       <section id="local-station" className="slide-section">
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, x: 300 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: false, amount: 0.1 }}
-          transition={{ duration: 0.4 }}
+          transition={{ type: 'spring', stiffness: 40, damping: 13 }}
           style={{ width: '100%', maxWidth: '1200px', padding: '0 var(--sp-2xl)', zIndex: 10 }}
         >
           <div
@@ -1850,7 +1900,7 @@ export default function LandingPage() {
                       initial={{ opacity: 0, x: -80, scale: 0.9 }}
                       whileInView={{ opacity: 1, x: 0, scale: 1 }}
                       viewport={{ once: false, amount: 0.1 }}
-                      transition={{ type: 'spring', stiffness: 60, damping: 13, delay: 0.1 * idx }}
+                      transition={{ type: 'spring', stiffness: 60, damping: 13, delay: 0.45 + 0.1 * idx }}
                     >
                       <div className="local-feature-icon">{item.icon}</div>
                       <div className="local-feature-text">
@@ -1875,7 +1925,7 @@ export default function LandingPage() {
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: false, amount: 0.1 }}
-                    transition={{ type: 'spring', stiffness: 60, damping: 14 }}
+                    transition={{ type: 'spring', stiffness: 60, damping: 14, delay: 0.45 }}
                     style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, margin: '0 0 var(--sp-xs) 0', color: 'var(--text-pri)' }}
                   >
                     How Local Mode Works:
@@ -1892,7 +1942,7 @@ export default function LandingPage() {
                       initial={{ opacity: 0, x: 80, scale: 0.95 }}
                       whileInView={{ opacity: 1, x: 0, scale: 1 }}
                       viewport={{ once: false, amount: 0.1 }}
-                      transition={{ type: 'spring', stiffness: 60, damping: 13, delay: 0.08 * idx }}
+                      transition={{ type: 'spring', stiffness: 60, damping: 13, delay: 0.5 + 0.08 * idx }}
                     >
                       <div className="local-flow-number">{idx + 1}</div>
                       <span>{step}</span>
@@ -1905,7 +1955,7 @@ export default function LandingPage() {
                   initial={{ opacity: 0, y: 50, scale: 0.9 }}
                   whileInView={{ opacity: 1, y: 0, scale: 1 }}
                   viewport={{ once: false, amount: 0.1 }}
-                  transition={{ type: 'spring', stiffness: 50, damping: 11, delay: 0.35 }}
+                  transition={{ type: 'spring', stiffness: 50, damping: 11, delay: 0.8 }}
                 >
                   <a
                     href="https://github.com/Felix-au/SyncZen-Local/releases/latest"
