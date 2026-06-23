@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
 import { useTheme } from '@/components/ThemeProvider'
+import { useSession } from 'next-auth/react'
 
 interface TiltCardProps {
   children: React.ReactNode
@@ -112,6 +113,7 @@ export default function LandingPage() {
   const [mockupSidebarOpen, setMockupSidebarOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [showLoader, setShowLoader] = useState(true)
+  const { data: session } = useSession()
 
   useEffect(() => {
     // Enable manual scroll restoration and force scroll to top on first mount
@@ -123,9 +125,7 @@ export default function LandingPage() {
     }
 
     setIsMounted(true)
-    const timer = setTimeout(() => {
-      setShowLoader(false)
-    }, 600)
+    setShowLoader(false)
 
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 900)
@@ -149,7 +149,6 @@ export default function LandingPage() {
     handleScroll()
 
     return () => {
-      clearTimeout(timer)
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('scroll', handleScroll, { capture: true })
     }
@@ -1027,8 +1026,8 @@ export default function LandingPage() {
               </svg>
             )}
           </button>
-          <Link href="/login" className="btn btn-primary btn-sm" id="nav-btn-get-started" style={{ padding: '8px 18px' }}>
-            Get Started
+          <Link href={session ? "/dashboard" : "/login"} className="btn btn-primary btn-sm" id="nav-btn-get-started" style={{ padding: '8px 18px' }}>
+            {session ? "Dashboard" : "Get Started"}
           </Link>
         </div>
       </header>
@@ -1093,8 +1092,8 @@ export default function LandingPage() {
             </p>
 
             <div style={{ width: '100%', maxWidth: '240px' }}>
-              <Link href="/login" className="hero-btn-primary" id="hero-get-started" style={{ width: '100%' }}>
-                Get Started
+              <Link href={session ? "/dashboard" : "/login"} className="hero-btn-primary" id="hero-get-started" style={{ width: '100%' }}>
+                {session ? "Dashboard" : "Get Started"}
               </Link>
             </div>
           </motion.div>
