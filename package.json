@@ -25,7 +25,8 @@
     "react-image-crop": "^11.0.10"
   },
   "overrides": {
-    "postcss": ">=8.5.10"
+    "postcss": ">=8.5.10",
+    "js-yaml": "^4.2.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.x",
