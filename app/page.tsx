@@ -2245,17 +2245,15 @@ export default function LandingPage() {
           {/* Slide 6: Contact & Support (Premium Support Form) */}
           <section id="contact-support" className="slide-section">
             <motion.div
-              initial={{ opacity: 0, scale: 0.8, rotateX: 20, rotateY: -45 }}
-              whileInView={{ opacity: 1, scale: 1.0, rotateX: 0, rotateY: 0 }}
+              initial={{ opacity: 0, y: 80 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.1 }}
-              transition={{ duration: 1.2, type: 'spring', stiffness: 40, damping: 12 }}
+              transition={{ duration: 0.85, type: 'spring', stiffness: 50, damping: 14 }}
               style={{
                 width: '100%',
                 maxWidth: '520px',
                 padding: '0 var(--sp-2xl)',
                 zIndex: 10,
-                perspective: 1200,
-                transformStyle: 'preserve-3d',
               }}
             >
               <div
@@ -2268,14 +2266,20 @@ export default function LandingPage() {
                 }}
               >
                 {/* Centered Header Block */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 'var(--sp-md)' }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false, amount: 0.1 }}
+                  transition={{ delay: 0.15, duration: 0.5, type: 'spring', stiffness: 80, damping: 12 }}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 'var(--sp-md)' }}
+                >
                   <h2 className="local-promo-title" style={{ marginBottom: '8px' }}>
                     Contact Support
                   </h2>
                   <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-sec)', lineHeight: 1.5, margin: 0 }}>
                     Submit a request to developers or report an issue in the workspace
                   </p>
-                </div>
+                </motion.div>
 
                 <form onSubmit={handleContactSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}>
                   {contactStatus.type && (
@@ -2291,7 +2295,13 @@ export default function LandingPage() {
                     </div>
                   )}
 
-                  <div className="input-group">
+                  <motion.div
+                    className="input-group"
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.1 }}
+                    transition={{ delay: 0.25, duration: 0.5, type: 'spring', stiffness: 80, damping: 12 }}
+                  >
                     <label className="input-label" htmlFor="contact-name">Name</label>
                     <input
                       id="contact-name"
@@ -2303,9 +2313,15 @@ export default function LandingPage() {
                       onChange={(e) => setContactName(e.target.value)}
                       disabled={isContactSubmitting}
                     />
-                  </div>
+                  </motion.div>
 
-                  <div className="input-group">
+                  <motion.div
+                    className="input-group"
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.1 }}
+                    transition={{ delay: 0.35, duration: 0.5, type: 'spring', stiffness: 80, damping: 12 }}
+                  >
                     <label className="input-label" htmlFor="contact-email">Email Address</label>
                     <input
                       id="contact-email"
@@ -2317,9 +2333,15 @@ export default function LandingPage() {
                       onChange={(e) => setContactEmail(e.target.value)}
                       disabled={isContactSubmitting}
                     />
-                  </div>
+                  </motion.div>
 
-                  <div className="input-group">
+                  <motion.div
+                    className="input-group"
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.1 }}
+                    transition={{ delay: 0.45, duration: 0.5, type: 'spring', stiffness: 80, damping: 12 }}
+                  >
                     <label className="input-label" htmlFor="contact-message">Message</label>
                     <textarea
                       id="contact-message"
@@ -2331,12 +2353,16 @@ export default function LandingPage() {
                       onChange={(e) => setContactMessage(e.target.value)}
                       disabled={isContactSubmitting}
                     />
-                  </div>
+                  </motion.div>
 
-                  <button
+                  <motion.button
                     type="submit"
                     className="hero-btn-primary"
                     disabled={isContactSubmitting}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.1 }}
+                    transition={{ delay: 0.55, duration: 0.5, type: 'spring', stiffness: 80, damping: 12 }}
                     style={{
                       width: '100%',
                       marginTop: 'var(--sp-xs)',
