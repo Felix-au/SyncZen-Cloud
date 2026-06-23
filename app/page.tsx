@@ -68,13 +68,13 @@ const flowGridVariants = {
 }
 
 const flowCardVariants = {
-  hidden: { opacity: 0, y: -350 },
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       type: 'spring',
-      stiffness: 25,
+      stiffness: 40,
       damping: 12
     }
   }
@@ -108,8 +108,16 @@ export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isDemoCheckInOpen, setIsDemoCheckInOpen] = useState(false)
   const [demoStep, setDemoStep] = useState(1)
+  const [isMobile, setIsMobile] = useState(false)
+  const [mockupSidebarOpen, setMockupSidebarOpen] = useState(false)
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 900)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+
     const handleScroll = () => {
       const scrollTop = Math.max(
         window.pageYOffset || 0,
@@ -124,7 +132,11 @@ export default function LandingPage() {
     }
     window.addEventListener('scroll', handleScroll, { capture: true, passive: true })
     handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll, { capture: true })
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('scroll', handleScroll, { capture: true })
+    }
   }, [])
 
   return (
@@ -619,8 +631,10 @@ export default function LandingPage() {
             width: 100%;
           }
           .features-square-grid {
+            grid-template-columns: 1fr;
             aspect-ratio: auto;
             grid-template-rows: auto;
+            gap: var(--sp-md);
           }
           .lp-flow-grid,
           .lp-roles-grid {
@@ -628,6 +642,24 @@ export default function LandingPage() {
           }
           .lp-flow-arrow {
             display: none;
+          }
+
+          /* Mobile Dashboard Mockup Layout Adjustments */
+          .lp-preview-body {
+            flex-direction: column;
+            height: 480px;
+          }
+          .lp-mini-stats-row {
+            gap: 6px;
+          }
+          .lp-mini-stat {
+            padding: 4px 6px;
+          }
+          .lp-mini-stat-val {
+            font-size: 14px;
+          }
+          .lp-mini-stat-lbl {
+            font-size: 7px;
           }
         }
 
@@ -815,7 +847,7 @@ export default function LandingPage() {
         @media (max-width: 900px) {
           .slide-section {
             width: 100%;
-            padding: var(--sp-xl) var(--sp-md);
+            padding: 100px var(--sp-md) var(--sp-xl) var(--sp-md);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -956,21 +988,21 @@ export default function LandingPage() {
           {/* Left Panel: Logo, Branding, Description (Centered) */}
           <motion.div
             className="left-panel"
-            initial={{ opacity: 0, y: 80 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.2 }}
+            initial={{ opacity: 0, y: isMobile ? 20 : 80 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.0, ease: 'easeOut' }}
           >
             <Image
               src="/logo.png"
               alt="SyncZen Cloud"
-              width={160}
-              height={160}
+              width={isMobile ? 100 : 160}
+              height={isMobile ? 100 : 160}
               style={{
                 borderRadius: 'var(--r-md)',
                 objectFit: 'contain',
                 filter: 'drop-shadow(0 4px 16px var(--accent-glow))',
                 marginBottom: 'var(--sp-sm)',
+                transition: 'all var(--t-base)',
               }}
             />
             <h1
@@ -1047,10 +1079,20 @@ export default function LandingPage() {
                 <motion.div
                   key={idx}
                   className="square-card"
-                  initial={{ opacity: 0, scale: 0.9, x: idx % 2 === 0 ? -250 : 250, y: idx < 2 ? -250 : 250 }}
+                  initial={{
+                    opacity: 0,
+                    scale: 0.9,
+                    x: isMobile ? 0 : (idx % 2 === 0 ? -250 : 250),
+                    y: isMobile ? 30 : (idx < 2 ? -250 : 250)
+                  }}
                   whileInView={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-                  viewport={{ once: false, amount: 0.2 }}
-                  transition={{ type: 'spring', stiffness: 50, damping: 14, delay: 0.1 * idx }}
+                  viewport={{ once: true, amount: 0.05 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 50,
+                    damping: 14,
+                    delay: isMobile ? 0.05 * idx : 0.1 * idx
+                  }}
                   whileHover={{ scale: 1.03 }}
                 >
                   {/* Large absolute background watermark icon */}
@@ -1127,28 +1169,105 @@ export default function LandingPage() {
             transition={{ duration: 1.2, type: 'spring', stiffness: 40, damping: 12 }}
           >
             <div className="lp-preview-card">
-              <div className="lp-preview-bar">
+              <div className="lp-preview-bar" style={{ display: 'flex', alignItems: 'center', gap: '6px', position: 'relative' }}>
+                {isMobile && (
+                  <button
+                    onClick={() => setMockupSidebarOpen(!mockupSidebarOpen)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--text-sec)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '4px',
+                      borderRadius: 'var(--r-xs)',
+                      zIndex: 60,
+                    }}
+                    aria-label="Toggle mockup navigation menu"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <line x1="3" y1="6"  x2="21" y2="6"  />
+                      <line x1="3" y1="12" x2="21" y2="12" />
+                      <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                  </button>
+                )}
                 <span className="lp-preview-dot red" />
                 <span className="lp-preview-dot amber" />
                 <span className="lp-preview-dot green" />
-                <span className="lp-preview-url">synczen.cloud/dashboard</span>
+                <span className="lp-preview-url" style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                  synczen.cloud/dashboard
+                </span>
               </div>
-              <div className="lp-preview-body">
+              <div className="lp-preview-body" style={{ position: 'relative' }}>
                 {/* Mini dashboard mockup */}
-                <div className="lp-mini-sidebar">
-                  <div className="lp-mini-brand" />
-                  {['Dashboard', 'Rooms', 'Bookings', 'Employees', 'Logs'].map(n => (
-                    <div
-                      key={n}
-                      className={`lp-mini-nav-item${activeTab === n ? ' lp-mini-active' : ''}`}
-                      onClick={() => setActiveTab(n)}
-                      style={{ cursor: 'pointer' }}
+                <AnimatePresence>
+                  {(!isMobile || mockupSidebarOpen) && (
+                    <motion.div
+                      className="lp-mini-sidebar"
+                      initial={isMobile ? { x: -150, opacity: 0 } : undefined}
+                      animate={isMobile ? { x: 0, opacity: 1 } : undefined}
+                      exit={isMobile ? { x: -150, opacity: 0 } : undefined}
+                      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                      style={
+                        isMobile
+                          ? {
+                              position: 'absolute',
+                              left: 0,
+                              top: 0,
+                              bottom: 0,
+                              width: '130px',
+                              zIndex: 50,
+                              background: 'var(--glass-bg)',
+                              backdropFilter: 'blur(20px) saturate(180%)',
+                              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                              borderRight: '1px solid var(--glass-border)',
+                              height: '100%',
+                              boxShadow: '4px 0 15px rgba(0,0,0,0.1)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              padding: 'var(--sp-md) var(--sp-xs)',
+                              gap: 'var(--sp-xs)',
+                            }
+                          : undefined
+                      }
                     >
-                      <div className="lp-mini-nav-dot" />
-                      <span>{n}</span>
-                    </div>
-                  ))}
-                </div>
+                      <div className="lp-mini-brand" style={{ display: isMobile ? 'none' : 'block' }} />
+                      {['Dashboard', 'Rooms', 'Bookings', 'Employees', 'Logs'].map(n => (
+                        <div
+                          key={n}
+                          className={`lp-mini-nav-item${activeTab === n ? ' lp-mini-active' : ''}`}
+                          onClick={() => {
+                            setActiveTab(n)
+                            if (isMobile) {
+                              setMockupSidebarOpen(false)
+                            }
+                          }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <div className="lp-mini-nav-dot" />
+                          <span>{n}</span>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Backdrop for mobile drawer */}
+                {isMobile && mockupSidebarOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'rgba(0,0,0,0.25)',
+                      zIndex: 40,
+                    }}
+                    onClick={() => setMockupSidebarOpen(false)}
+                  />
+                )}
+
                 <div className="lp-mini-main" style={{ position: 'relative' }}>
                   <AnimatePresence mode="wait">
                     {isDemoCheckInOpen ? (
@@ -1767,7 +1886,7 @@ export default function LandingPage() {
       {/* Slide 4: Comparison Section */}
       <section id="why-synczen" className="slide-section">
         <motion.div
-          initial={{ opacity: 0, x: -300 }}
+          initial={{ opacity: 0, x: -100 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: false, amount: 0.15 }}
           transition={{ type: 'spring', stiffness: 40, damping: 13 }}
@@ -1799,41 +1918,88 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <th style={{ textAlign: 'left', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>Capability</th>
-                    <th style={{ textAlign: 'center', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>Legacy PMS</th>
-                    <th style={{ textAlign: 'center', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 800 }}>SyncZen Cloud</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { name: 'Check-In Logging', legacy: 'Complex multi-tab forms', modern: 'Smooth 4-step check-in wizard' },
-                    { name: 'Guest Avatars', legacy: 'Manual scanners / local files', modern: 'In-browser tools & secure CDN storage' },
-                    { name: 'Data Analytics', legacy: 'Static end-of-day printouts', modern: 'Live interactive dashboard analytics' },
-                    { name: 'Audit Trails', legacy: 'None or hidden inside flat logs', modern: 'Dynamic and easy to access activity logger' },
-                    { name: 'Room Rates', legacy: 'Locked standard price tags', modern: 'On-the-fly custom overrides' },
-                  ].map((row, idx) => (
-                    <motion.tr
-                      key={idx}
-                      initial={{ opacity: 0, scale: 0.85, y: 20 }}
-                      whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                      viewport={{ once: false, amount: 0.1 }}
-                      transition={{ type: 'spring', stiffness: 80, damping: 12, delay: 0.4 + 0.12 * idx }}
-                      style={{ borderBottom: idx < 4 ? '1px solid var(--border)' : 'none' }}
-                    >
-                      <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{row.name}</td>
-                      <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', textAlign: 'center' }}>{row.legacy}</td>
-                      <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-pri)', fontWeight: 700, textAlign: 'center' }}>
-                        {row.modern}
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {!isMobile ? (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                      <th style={{ textAlign: 'left', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>Capability</th>
+                      <th style={{ textAlign: 'center', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>Legacy PMS</th>
+                      <th style={{ textAlign: 'center', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 800 }}>SyncZen Cloud</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { name: 'Check-In Logging', legacy: 'Complex multi-tab forms', modern: 'Smooth 4-step check-in wizard' },
+                      { name: 'Guest Avatars', legacy: 'Manual scanners / local files', modern: 'In-browser tools & secure CDN storage' },
+                      { name: 'Data Analytics', legacy: 'Static end-of-day printouts', modern: 'Live interactive dashboard analytics' },
+                      { name: 'Audit Trails', legacy: 'None or hidden inside flat logs', modern: 'Dynamic and easy to access activity logger' },
+                      { name: 'Room Rates', legacy: 'Locked standard price tags', modern: 'On-the-fly custom overrides' },
+                    ].map((row, idx) => (
+                      <motion.tr
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.85, y: 20 }}
+                        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.1 }}
+                        transition={{ type: 'spring', stiffness: 80, damping: 12, delay: 0.4 + 0.12 * idx }}
+                        style={{ borderBottom: idx < 4 ? '1px solid var(--border)' : 'none' }}
+                      >
+                        <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{row.name}</td>
+                        <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', textAlign: 'center' }}>{row.legacy}</td>
+                        <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-pri)', fontWeight: 700, textAlign: 'center' }}>
+                          {row.modern}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)', textAlign: 'left' }}>
+                {[
+                  { name: 'Check-In Logging', legacy: 'Complex multi-tab forms', modern: 'Smooth 4-step check-in wizard' },
+                  { name: 'Guest Avatars', legacy: 'Manual scanners / local files', modern: 'In-browser tools & secure CDN storage' },
+                  { name: 'Data Analytics', legacy: 'Static end-of-day printouts', modern: 'Live interactive dashboard analytics' },
+                  { name: 'Audit Trails', legacy: 'None or hidden inside flat logs', modern: 'Dynamic and easy to access activity logger' },
+                  { name: 'Room Rates', legacy: 'Locked standard price tags', modern: 'On-the-fly custom overrides' },
+                ].map((row, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.1 }}
+                    transition={{ type: 'spring', stiffness: 80, damping: 12, delay: 0.1 * idx }}
+                    style={{
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--r-md)',
+                      padding: 'var(--sp-md)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 'var(--sp-sm)',
+                    }}
+                  >
+                    <div style={{ fontWeight: 800, fontSize: 'var(--fs-md)', color: 'var(--text-pri)', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>
+                      {row.name}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-md)' }}>
+                      <div>
+                        <div style={{ fontSize: '9px', fontWeight: 900, color: 'var(--text-mute)', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '2px' }}>
+                          Legacy PMS
+                        </div>
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-sec)' }}>{row.legacy}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '9px', fontWeight: 900, color: 'var(--accent)', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '2px' }}>
+                          SyncZen Cloud
+                        </div>
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-pri)', fontWeight: 700 }}>{row.modern}</div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </motion.div>
       </section>
