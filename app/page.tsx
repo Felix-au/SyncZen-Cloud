@@ -3,9 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useTheme } from '@/components/ThemeProvider'
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState('Dashboard')
+  const { theme, toggle } = useTheme()
   return (
     <div
       style={{
@@ -647,6 +650,26 @@ export default function LandingPage() {
             margin: 0 auto var(--sp-xs) auto;
           }
         }
+        .btn-theme-toggle {
+          background: var(--glass-bg);
+          border: 1px solid var(--glass-border);
+          color: var(--text-pri);
+          padding: 8px 12px;
+          border-radius: var(--r-md);
+          font-size: 16px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all var(--t-base);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+        }
+        .btn-theme-toggle:hover {
+          background: var(--glass-hover);
+          border-color: var(--border-hi);
+          transform: scale(1.05);
+        }
       `}</style>
 
       {/* Navigation Header */}
@@ -661,7 +684,14 @@ export default function LandingPage() {
           />
           <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px' }}>SyncZen</span>
         </div>
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-sm)' }}>
+          <button
+            onClick={toggle}
+            className="btn-theme-toggle"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
           <Link href="/login" className="btn btn-primary btn-sm" id="nav-btn-get-started" style={{ padding: '8px 18px' }}>
             Get Started
           </Link>
@@ -673,7 +703,12 @@ export default function LandingPage() {
         <div className="main-container">
 
           {/* Left Panel: Logo, Branding, Description (Centered) */}
-          <div className="left-panel">
+          <motion.div
+            className="left-panel"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          >
             <Image
               src="/logo.png"
               alt="SyncZen Cloud"
@@ -726,7 +761,7 @@ export default function LandingPage() {
                 Get Started
               </Link>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Panel: Features 2x2 Square Grid */}
           <div className="right-panel">
@@ -757,7 +792,14 @@ export default function LandingPage() {
                   desc: 'Weighted role-based permissions restrict staff actions and protect hotel properties.',
                 },
               ].map((feat, idx) => (
-                <div key={idx} className="square-card">
+                <motion.div
+                  key={idx}
+                  className="square-card"
+                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 * idx, ease: 'easeOut' }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                >
                   <div
                     style={{
                       fontSize: '22px',
@@ -780,7 +822,7 @@ export default function LandingPage() {
                   <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-sec)', margin: 0, lineHeight: 1.4 }}>
                     {feat.desc}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -789,7 +831,11 @@ export default function LandingPage() {
       </main>
 
       {/* Dashboard Preview Section */}
-      <section
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.7 }}
         style={{
           width: '100%',
           maxWidth: '1200px',
@@ -836,187 +882,202 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <div className="lp-mini-main">
-                {activeTab === 'Dashboard' && (
-                  <>
-                    <div className="lp-mini-stats-row">
-                      {[
-                        { label: 'Total Rooms', val: '48', color: 'blue' },
-                        { label: 'Available', val: '31', color: 'green' },
-                        { label: 'Occupied', val: '17', color: 'amber' },
-                      ].map(s => (
-                        <div key={s.label} className={`lp-mini-stat lp-mini-stat-${s.color}`}>
-                          <div className="lp-mini-stat-val">{s.val}</div>
-                          <div className="lp-mini-stat-lbl">{s.label}</div>
+              <div className="lp-mini-main" style={{ position: 'relative' }}>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15 }}
+                    style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}
+                  >
+                    {activeTab === 'Dashboard' && (
+                      <>
+                        <div className="lp-mini-stats-row">
+                          {[
+                            { label: 'Total Rooms', val: '48', color: 'blue' },
+                            { label: 'Available', val: '31', color: 'green' },
+                            { label: 'Occupied', val: '17', color: 'amber' },
+                          ].map(s => (
+                            <div key={s.label} className={`lp-mini-stat lp-mini-stat-${s.color}`}>
+                              <div className="lp-mini-stat-val">{s.val}</div>
+                              <div className="lp-mini-stat-lbl">{s.label}</div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                    <div className="lp-mini-table-head">
-                      <span>Recent Check-ins</span>
-                      <span className="lp-mini-badge">Live</span>
-                    </div>
-                    {[
-                      { name: 'Aarav Sharma', room: '204', time: '2m ago' },
-                      { name: 'Priya Mehta', room: '310', time: '18m ago' },
-                      { name: 'Raj Patel', room: '101', time: '1h ago' },
-                    ].map(g => (
-                      <div key={g.name} className="lp-mini-row">
-                        <div className="lp-mini-avatar">{g.name[0]}</div>
-                        <div className="lp-mini-info">
-                          <span className="lp-mini-name">{g.name}</span>
-                          <span className="lp-mini-room">Room {g.room}</span>
+                        <div className="lp-mini-table-head">
+                          <span>Recent Check-ins</span>
+                          <span className="lp-mini-badge">Live</span>
                         </div>
-                        <span className="lp-mini-time">{g.time}</span>
-                      </div>
-                    ))}
-                  </>
-                )}
-
-                {activeTab === 'Rooms' && (
-                  <>
-                    <div className="lp-mini-table-head">
-                      <span>Live Room Grid</span>
-                      <span className="lp-mini-badge">Live</span>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                      {[
-                        { num: '101', status: 'occupied', label: 'Deluxe' },
-                        { num: '102', status: 'available', label: 'Suite' },
-                        { num: '103', status: 'maintenance', label: 'Standard' },
-                        { num: '201', status: 'available', label: 'Deluxe' },
-                        { num: '202', status: 'occupied', label: 'Suite' },
-                        { num: '203', status: 'available', label: 'Standard' },
-                      ].map(r => (
-                        <div key={r.num} style={{
-                          padding: '8px',
-                          borderRadius: 'var(--r-sm)',
-                          background: 'var(--surface)',
-                          border: '1px solid var(--border)',
-                          textAlign: 'center',
-                          fontSize: '10px'
-                        }}>
-                          <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{r.num}</div>
-                          <div style={{ fontSize: '8px', color: 'var(--text-mute)', marginBottom: '4px' }}>{r.label}</div>
-                          <span className={`badge badge-${r.status === 'available' ? 'green' : r.status === 'occupied' ? 'amber' : 'red'}`} style={{ fontSize: '8px', padding: '1px 4px' }}>
-                            {r.status}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-
-                {activeTab === 'Bookings' && (
-                  <>
-                    <div className="lp-mini-table-head">
-                      <span>Active Bookings</span>
-                      <span className="lp-mini-badge">Live</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {[
-                        { guest: 'Aarav Sharma', room: '204', rate: '$120', status: 'Confirmed' },
-                        { guest: 'Priya Mehta', room: '310', rate: '$150', status: 'Active' },
-                        { guest: 'Kabir Sen', room: '105', rate: '$95', status: 'Pending' },
-                      ].map((b, i) => (
-                        <div key={i} style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          padding: '8px var(--sp-sm)',
-                          borderRadius: 'var(--r-sm)',
-                          background: 'var(--surface)',
-                          border: '1px solid var(--border)',
-                          fontSize: '11px'
-                        }}>
-                          <div>
-                            <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{b.guest}</div>
-                            <div style={{ fontSize: '9px', color: 'var(--text-mute)' }}>Room {b.room} • {b.rate}/night</div>
+                        {[
+                          { name: 'Aarav Sharma', room: '204', time: '2m ago' },
+                          { name: 'Priya Mehta', room: '310', time: '18m ago' },
+                          { name: 'Raj Patel', room: '101', time: '1h ago' },
+                        ].map(g => (
+                          <div key={g.name} className="lp-mini-row">
+                            <div className="lp-mini-avatar">{g.name[0]}</div>
+                            <div className="lp-mini-info">
+                              <span className="lp-mini-name">{g.name}</span>
+                              <span className="lp-mini-room">Room {g.room}</span>
+                            </div>
+                            <span className="lp-mini-time">{g.time}</span>
                           </div>
-                          <span className={`badge badge-${b.status === 'Active' ? 'green' : b.status === 'Confirmed' ? 'blue' : 'amber'}`} style={{ fontSize: '8px', padding: '2px 6px' }}>
-                            {b.status}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
+                        ))}
+                      </>
+                    )}
 
-                {activeTab === 'Employees' && (
-                  <>
-                    <div className="lp-mini-table-head">
-                      <span>Hotel Staff Roles</span>
-                      <span className="lp-mini-badge">Live</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {[
-                        { name: 'Felix Carter', role: 'Owner', weight: '50', color: 'blue' },
-                        { name: 'Elena Rostova', role: 'Manager', weight: '30', color: 'amber' },
-                        { name: 'Rohan Das', role: 'Staff', weight: '10', color: 'green' },
-                      ].map((emp, i) => (
-                        <div key={i} style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          padding: '8px var(--sp-sm)',
-                          borderRadius: 'var(--r-sm)',
-                          background: 'var(--surface)',
-                          border: '1px solid var(--border)',
-                          fontSize: '11px'
-                        }}>
-                          <div>
-                            <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{emp.name}</div>
-                            <div style={{ fontSize: '9px', color: 'var(--text-mute)' }}>{emp.role}</div>
-                          </div>
-                          <span className={`badge badge-${emp.color}`} style={{ fontSize: '8px', padding: '2px 6px' }}>
-                            W: {emp.weight}
-                          </span>
+                    {activeTab === 'Rooms' && (
+                      <>
+                        <div className="lp-mini-table-head">
+                          <span>Live Room Grid</span>
+                          <span className="lp-mini-badge">Live</span>
                         </div>
-                      ))}
-                    </div>
-                  </>
-                )}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          {[
+                            { num: '101', status: 'occupied', label: 'Deluxe' },
+                            { num: '102', status: 'available', label: 'Suite' },
+                            { num: '103', status: 'maintenance', label: 'Standard' },
+                            { num: '201', status: 'available', label: 'Deluxe' },
+                            { num: '202', status: 'occupied', label: 'Suite' },
+                            { num: '203', status: 'available', label: 'Standard' },
+                          ].map(r => (
+                            <div key={r.num} style={{
+                              padding: '8px',
+                              borderRadius: 'var(--r-sm)',
+                              background: 'var(--surface)',
+                              border: '1px solid var(--border)',
+                              textAlign: 'center',
+                              fontSize: '10px'
+                            }}>
+                              <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{r.num}</div>
+                              <div style={{ fontSize: '8px', color: 'var(--text-mute)', marginBottom: '4px' }}>{r.label}</div>
+                              <span className={`badge badge-${r.status === 'available' ? 'green' : r.status === 'occupied' ? 'amber' : 'red'}`} style={{ fontSize: '8px', padding: '1px 4px' }}>
+                                {r.status}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
 
-                {activeTab === 'Logs' && (
-                  <>
-                    <div className="lp-mini-table-head">
-                      <span>Activity Log</span>
-                      <span className="lp-mini-badge">Live</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      {[
-                        { action: 'Staff check-in Aarav Sharma', time: '2m ago', icon: '🔑' },
-                        { action: 'Staff checkout Sarah Jenkins', time: '15m ago', icon: '🚪' },
-                        { action: 'Manager override rate Room 310', time: '1h ago', icon: '💰' },
-                        { action: 'Admin updated settings', time: '4h ago', icon: '⚙️' },
-                      ].map((log, i) => (
-                        <div key={i} style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: '8px',
-                          padding: '6px 8px',
-                          borderRadius: 'var(--r-xs)',
-                          background: 'var(--surface)',
-                          border: '1px solid var(--border)',
-                          fontSize: '10px'
-                        }}>
-                          <span style={{ fontSize: '12px' }}>{log.icon}</span>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ color: 'var(--text-pri)', lineHeight: '1.3' }}>{log.action}</div>
-                            <div style={{ fontSize: '8px', color: 'var(--text-mute)', marginTop: '2px' }}>{log.time}</div>
-                          </div>
+                    {activeTab === 'Bookings' && (
+                      <>
+                        <div className="lp-mini-table-head">
+                          <span>Active Bookings</span>
+                          <span className="lp-mini-badge">Live</span>
                         </div>
-                      ))}
-                    </div>
-                  </>
-                )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {[
+                            { guest: 'Aarav Sharma', room: '204', rate: '$120', status: 'Confirmed' },
+                            { guest: 'Priya Mehta', room: '310', rate: '$150', status: 'Active' },
+                            { guest: 'Kabir Sen', room: '105', rate: '$95', status: 'Pending' },
+                          ].map((b, i) => (
+                            <div key={i} style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: '8px var(--sp-sm)',
+                              borderRadius: 'var(--r-sm)',
+                              background: 'var(--surface)',
+                              border: '1px solid var(--border)',
+                              fontSize: '11px'
+                            }}>
+                              <div>
+                                <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{b.guest}</div>
+                                <div style={{ fontSize: '9px', color: 'var(--text-mute)' }}>Room {b.room} • {b.rate}/night</div>
+                              </div>
+                              <span className={`badge badge-${b.status === 'Active' ? 'green' : b.status === 'Confirmed' ? 'blue' : 'amber'}`} style={{ fontSize: '8px', padding: '2px 6px' }}>
+                                {b.status}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {activeTab === 'Employees' && (
+                      <>
+                        <div className="lp-mini-table-head">
+                          <span>Hotel Staff Roles</span>
+                          <span className="lp-mini-badge">Live</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {[
+                            { name: 'Felix Carter', role: 'Owner', weight: '50', color: 'blue' },
+                            { name: 'Elena Rostova', role: 'Manager', weight: '30', color: 'amber' },
+                            { name: 'Rohan Das', role: 'Staff', weight: '10', color: 'green' },
+                          ].map((emp, i) => (
+                            <div key={i} style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: '8px var(--sp-sm)',
+                              borderRadius: 'var(--r-sm)',
+                              background: 'var(--surface)',
+                              border: '1px solid var(--border)',
+                              fontSize: '11px'
+                            }}>
+                              <div>
+                                <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{emp.name}</div>
+                                <div style={{ fontSize: '9px', color: 'var(--text-mute)' }}>{emp.role}</div>
+                              </div>
+                              <span className={`badge badge-${emp.color}`} style={{ fontSize: '8px', padding: '2px 6px' }}>
+                                W: {emp.weight}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {activeTab === 'Logs' && (
+                      <>
+                        <div className="lp-mini-table-head">
+                          <span>Activity Log</span>
+                          <span className="lp-mini-badge">Live</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {[
+                            { action: 'Staff check-in Aarav Sharma', time: '2m ago', icon: '🔑' },
+                            { action: 'Staff checkout Sarah Jenkins', time: '15m ago', icon: '🚪' },
+                            { action: 'Manager override rate Room 310', time: '1h ago', icon: '💰' },
+                            { action: 'Admin updated settings', time: '4h ago', icon: '⚙️' },
+                          ].map((log, i) => (
+                            <div key={i} style={{
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: '8px',
+                              padding: '6px 8px',
+                              borderRadius: 'var(--r-xs)',
+                              background: 'var(--surface)',
+                              border: '1px solid var(--border)',
+                              fontSize: '10px'
+                            }}>
+                              <span style={{ fontSize: '12px' }}>{log.icon}</span>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ color: 'var(--text-pri)', lineHeight: '1.3' }}>{log.action}</div>
+                                <div style={{ fontSize: '8px', color: 'var(--text-mute)', marginTop: '2px' }}>{log.time}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Guest Check-In Flow Section */}
-      <section
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.6 }}
         style={{
           width: '100%',
           maxWidth: '1200px',
@@ -1057,18 +1118,30 @@ export default function LandingPage() {
               desc: 'Set custom nightly rate, pick payment mode, then commit the booking.',
             },
           ].map((step, idx) => (
-            <div key={idx} className="lp-flow-card">
+            <motion.div
+              key={idx}
+              className="lp-flow-card"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 * idx }}
+              whileHover={{ y: -5, scale: 1.02 }}
+            >
               <div className="lp-flow-num">{step.num}</div>
               <h3 className="lp-flow-title">{step.title}</h3>
               <p className="lp-flow-desc">{step.desc}</p>
               {idx < 3 && <div className="lp-flow-arrow">→</div>}
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Access Control Section */}
-      <section
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.6 }}
         style={{
           width: '100%',
           maxWidth: '1200px',
@@ -1125,7 +1198,15 @@ export default function LandingPage() {
               ],
             },
           ].map((role, idx) => (
-            <div key={idx} className={`lp-role-card ${role.class}`}>
+            <motion.div
+              key={idx}
+              className={`lp-role-card ${role.class}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 * idx }}
+              whileHover={{ y: -4, scale: 1.01 }}
+            >
               <div className="lp-role-header">
                 <div className="lp-role-title-row">
                   <span className="lp-role-icon">{role.icon}</span>
@@ -1141,13 +1222,17 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Comparison Section */}
-      <section
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.6 }}
         style={{
           width: '100%',
           maxWidth: '1200px',
@@ -1205,10 +1290,17 @@ export default function LandingPage() {
             </table>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* SyncZen Local Segment (Premium Two-Column Layout) */}
-      <section className="local-promo-section" style={{ maxWidth: '1200px', margin: 'var(--sp-2xl) auto 0 auto', padding: '0 var(--sp-2xl)' }}>
+      <motion.section
+        className="local-promo-section"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.6 }}
+        style={{ maxWidth: '1200px', margin: 'var(--sp-2xl) auto 0 auto', padding: '0 var(--sp-2xl)' }}
+      >
         <div
           className="glass-card"
           style={{
@@ -1308,7 +1400,7 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
       <footer
