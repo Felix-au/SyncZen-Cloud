@@ -33,7 +33,7 @@ interface SidebarProps {
 }
 
 /* ── SVG icons ─────────────────────────────────────────────────── */
-function SunIcon() {
+export function SunIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="5" />
@@ -49,7 +49,7 @@ function SunIcon() {
   )
 }
 
-function MoonIcon() {
+export function MoonIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
@@ -57,7 +57,7 @@ function MoonIcon() {
   )
 }
 
-function SignOutIcon() {
+export function SignOutIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -82,11 +82,13 @@ export function Sidebar({ open, onClose }: SidebarProps) {
     <aside className={`sidebar ${open ? 'open' : ''}`}>
       {/* Brand */}
       <div className="sidebar-brand">
-        <Image src="/logo.png" alt="SyncZen" width={36} height={36} style={{ borderRadius: 8, objectFit: 'contain' }} />
-        <div>
-          <div className="sidebar-name">SyncZen</div>
-          <div className="sidebar-tag">{isSuper ? 'Super Admin' : 'Hotel Cloud'}</div>
-        </div>
+        <Link href="/home" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Image src="/logo.png" alt="SyncZen" width={36} height={36} style={{ borderRadius: 8, objectFit: 'contain' }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="sidebar-name" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>SyncZen</div>
+            <div className="sidebar-tag">{isSuper ? 'Super Admin' : 'Hotel Cloud'}</div>
+          </div>
+        </Link>
 
         {/* Close button — only visible on mobile */}
         <button

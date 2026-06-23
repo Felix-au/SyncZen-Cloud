@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Sidebar } from '@/components/Sidebar'
+import { Sidebar, SunIcon, MoonIcon, SignOutIcon } from '@/components/Sidebar'
+import { useTheme } from '@/components/ThemeProvider'
+import { signOut } from 'next-auth/react'
 
 /**
  * Layout shared across all authenticated hotel-app pages.
@@ -9,6 +11,7 @@ import { Sidebar } from '@/components/Sidebar'
  */
 export default function HotelLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { theme, toggle } = useTheme()
 
   return (
     <div className="app-shell">
@@ -26,7 +29,28 @@ export default function HotelLayout({ children }: { children: React.ReactNode })
           </svg>
         </button>
         <span className="mobile-topbar-title">SyncZen</span>
-        <div style={{ width: 36 }} /> {/* spacer to centre title */}
+        
+        {/* Mobile quick actions: Theme & Logout */}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button
+            onClick={toggle}
+            className="icon-btn"
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            aria-label="Toggle theme"
+            style={{ width: 32, height: 32, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}
+          >
+            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+          </button>
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="icon-btn icon-btn-danger"
+            title="Sign out"
+            aria-label="Sign out"
+            style={{ width: 32, height: 32, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}
+          >
+            <SignOutIcon />
+          </button>
+        </div>
       </header>
 
       {/* Sidebar — drawer on mobile, fixed panel on desktop */}
