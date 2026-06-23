@@ -67,8 +67,11 @@ export default function LandingPage() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollEl = document.scrollingElement || document.documentElement
-      const scrollTop = scrollEl.scrollTop || 0
+      const scrollTop = Math.max(
+        window.pageYOffset || 0,
+        document.documentElement?.scrollTop || 0,
+        document.body?.scrollTop || 0
+      )
       if (scrollTop > 50) {
         setIsScrolled(true)
       } else {
@@ -1020,7 +1023,7 @@ export default function LandingPage() {
                   >
                     {feat.icon}
                   </div>
-                  
+
                   {/* Content */}
                   <h4 style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--text-pri)', margin: 0, zIndex: 2 }}>
                     {feat.title}
@@ -1054,498 +1057,498 @@ export default function LandingPage() {
             gap: '8px',
           }}
         >
-        <div style={{ textAlign: 'center', marginBottom: '4px' }}>
-          <h2 style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '2px' }}>
-            Interactive Operations Dashboard
-          </h2>
-          <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: '0' }}>
-            A unified center featuring live status statistics and real-time hotel activity logs.
-          </p>
-        </div>
+          <div style={{ textAlign: 'center', marginBottom: '4px' }}>
+            <h2 style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '2px' }}>
+              Interactive Operations Dashboard
+            </h2>
+            <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: '0' }}>
+              A unified center featuring live status statistics and real-time hotel activity logs.
+            </p>
+          </div>
 
-        {/* Dashboard preview card */}
-        <div className="lp-hero-preview" style={{ marginTop: '0px' }}>
-          <div className="lp-preview-card">
-            <div className="lp-preview-bar">
-              <span className="lp-preview-dot red" />
-              <span className="lp-preview-dot amber" />
-              <span className="lp-preview-dot green" />
-              <span className="lp-preview-url">synczen.cloud/dashboard</span>
-            </div>
-            <div className="lp-preview-body">
-              {/* Mini dashboard mockup */}
-              <div className="lp-mini-sidebar">
-                <div className="lp-mini-brand" />
-                {['Dashboard', 'Rooms', 'Bookings', 'Employees', 'Logs'].map(n => (
-                  <div
-                    key={n}
-                    className={`lp-mini-nav-item${activeTab === n ? ' lp-mini-active' : ''}`}
-                    onClick={() => setActiveTab(n)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="lp-mini-nav-dot" />
-                    <span>{n}</span>
-                  </div>
-                ))}
+          {/* Dashboard preview card */}
+          <div className="lp-hero-preview" style={{ marginTop: '0px' }}>
+            <div className="lp-preview-card">
+              <div className="lp-preview-bar">
+                <span className="lp-preview-dot red" />
+                <span className="lp-preview-dot amber" />
+                <span className="lp-preview-dot green" />
+                <span className="lp-preview-url">synczen.cloud/dashboard</span>
               </div>
-              <div className="lp-mini-main" style={{ position: 'relative' }}>
-                <AnimatePresence mode="wait">
-                  {isDemoCheckInOpen ? (
-                    <motion.div
-                      key="demo-wizard"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.18 }}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        background: 'var(--bg)',
-                        zIndex: 20,
-                        padding: 'var(--sp-md)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 'var(--sp-xs)',
-                        overflowY: 'auto'
-                      }}
+              <div className="lp-preview-body">
+                {/* Mini dashboard mockup */}
+                <div className="lp-mini-sidebar">
+                  <div className="lp-mini-brand" />
+                  {['Dashboard', 'Rooms', 'Bookings', 'Employees', 'Logs'].map(n => (
+                    <div
+                      key={n}
+                      className={`lp-mini-nav-item${activeTab === n ? ' lp-mini-active' : ''}`}
+                      onClick={() => setActiveTab(n)}
+                      style={{ cursor: 'pointer' }}
                     >
-                      {/* Header */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--accent)' }}>Demo Check-In Wizard</span>
-                        <button
-                          onClick={() => setIsDemoCheckInOpen(false)}
-                          style={{ background: 'transparent', border: 'none', color: 'var(--text-mute)', fontSize: '12px', cursor: 'pointer' }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-
-                      {/* Step Indicators */}
-                      {demoStep <= 4 ? (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold', padding: '2px 0' }}>
-                          {['Guest', 'ID Proof', 'Room', 'Confirm'].map((name, i) => (
-                            <span key={i} style={{ color: demoStep === i + 1 ? 'var(--accent)' : 'inherit' }}>
-                              {i + 1}. {name}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <div style={{ display: 'flex', justifyContent: 'center', fontSize: '8px', color: '#10b981', fontWeight: 'bold', padding: '2px 0' }}>
-                          🎉 Booking Confirmed Successfully
-                        </div>
-                      )}
-
-                      {/* Step Contents */}
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '10px', marginTop: '4px' }}>
-                        {demoStep === 1 && (
-                          <>
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--surface)', padding: '6px', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)' }}>
-                              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)', overflow: 'hidden' }}>
-                                <img src="/logo.png" alt="Guest Avatar" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                              </div>
-                              <div>
-                                <div style={{ fontWeight: 'bold', fontSize: '10px' }}>Rohan Verma</div>
-                                <div style={{ fontSize: '8px', color: 'var(--text-sec)' }}>+91 98765 43210</div>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
-                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>GUEST NAME</label>
-                              <input type="text" readOnly value="Rohan Verma" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
-                            </div>
-                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
-                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>PHONE NUMBER</label>
-                              <input type="text" readOnly value="+91 98765 43210" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
-                            </div>
-                          </>
-                        )}
-
-                        {demoStep === 2 && (
-                          <>
-                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
-                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>DOCUMENT TYPE</label>
-                              <input type="text" readOnly value="Aadhaar Card" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
-                            </div>
-                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
-                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>ID NUMBER</label>
-                              <input type="text" readOnly value="1234 5678 9012" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
-                            </div>
-                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
-                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>ID ATTACHMENT</label>
-                              <div style={{ height: '32px', border: '1px dashed var(--border-hi)', borderRadius: '2px', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px', background: 'rgba(0,0,0,0.02)' }}>
-                                <img src="/logo.png" alt="ID Document" style={{ height: '100%', objectFit: 'contain' }} />
-                                <span style={{ fontSize: '8px', color: 'var(--text-mute)' }}>aadhaar_rohan_verma.jpg</span>
-                              </div>
-                            </div>
-                          </>
-                        )}
-
-                        {demoStep === 3 && (
-                          <>
-                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
-                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>SELECTED ROOM</label>
-                              <input type="text" readOnly value="Room 202" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
-                            </div>
-                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
-                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>ROOM TYPE</label>
-                              <input type="text" readOnly value="Suite" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
-                            </div>
-                            <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
-                              <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>NIGHTLY RATE</label>
-                              <input type="text" readOnly value="₹12,000 / night" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
-                            </div>
-                          </>
-                        )}
-
-                        {demoStep === 4 && (
-                          <>
-                            <div style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px solid var(--border)', padding: '6px', borderRadius: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
-                                <span style={{ color: 'var(--text-mute)' }}>Guest:</span>
-                                <span style={{ fontWeight: 'bold' }}>Rohan Verma</span>
-                              </div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
-                                <span style={{ color: 'var(--text-mute)' }}>ID:</span>
-                                <span>Aadhaar (Verified)</span>
-                              </div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
-                                <span style={{ color: 'var(--text-mute)' }}>Room:</span>
-                                <span style={{ fontWeight: 'bold' }}>Room 202 (Suite)</span>
-                              </div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
-                                <span style={{ color: 'var(--text-mute)' }}>Total:</span>
-                                <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>₹12,000 / night</span>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center', marginTop: '2px' }}>
-                              <span style={{ fontSize: '9px' }}>✅ Ready to Check-In</span>
-                            </div>
-                          </>
-                        )}
-
-                        {demoStep === 5 && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ type: 'spring', duration: 0.5 }}
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '8px',
-                              padding: '12px 0',
-                              textAlign: 'center',
-                              flex: 1,
-                            }}
+                      <div className="lp-mini-nav-dot" />
+                      <span>{n}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="lp-mini-main" style={{ position: 'relative' }}>
+                  <AnimatePresence mode="wait">
+                    {isDemoCheckInOpen ? (
+                      <motion.div
+                        key="demo-wizard"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.18 }}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          background: 'var(--bg)',
+                          zIndex: 20,
+                          padding: 'var(--sp-md)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 'var(--sp-xs)',
+                          overflowY: 'auto'
+                        }}
+                      >
+                        {/* Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--accent)' }}>Demo Check-In Wizard</span>
+                          <button
+                            onClick={() => setIsDemoCheckInOpen(false)}
+                            style={{ background: 'transparent', border: 'none', color: 'var(--text-mute)', fontSize: '12px', cursor: 'pointer' }}
                           >
+                            ✕
+                          </button>
+                        </div>
+
+                        {/* Step Indicators */}
+                        {demoStep <= 4 ? (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold', padding: '2px 0' }}>
+                            {['Guest', 'ID Proof', 'Room', 'Confirm'].map((name, i) => (
+                              <span key={i} style={{ color: demoStep === i + 1 ? 'var(--accent)' : 'inherit' }}>
+                                {i + 1}. {name}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', justifyContent: 'center', fontSize: '8px', color: '#10b981', fontWeight: 'bold', padding: '2px 0' }}>
+                            🎉 Booking Confirmed Successfully
+                          </div>
+                        )}
+
+                        {/* Step Contents */}
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '10px', marginTop: '4px' }}>
+                          {demoStep === 1 && (
+                            <>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--surface)', padding: '6px', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)' }}>
+                                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)', overflow: 'hidden' }}>
+                                  <img src="/logo.png" alt="Guest Avatar" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                </div>
+                                <div>
+                                  <div style={{ fontWeight: 'bold', fontSize: '10px' }}>Rohan Verma</div>
+                                  <div style={{ fontSize: '8px', color: 'var(--text-sec)' }}>+91 98765 43210</div>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                                <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>GUEST NAME</label>
+                                <input type="text" readOnly value="Rohan Verma" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                              </div>
+                              <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                                <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>PHONE NUMBER</label>
+                                <input type="text" readOnly value="+91 98765 43210" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                              </div>
+                            </>
+                          )}
+
+                          {demoStep === 2 && (
+                            <>
+                              <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                                <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>DOCUMENT TYPE</label>
+                                <input type="text" readOnly value="Aadhaar Card" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                              </div>
+                              <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                                <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>ID NUMBER</label>
+                                <input type="text" readOnly value="1234 5678 9012" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                              </div>
+                              <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                                <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>ID ATTACHMENT</label>
+                                <div style={{ height: '32px', border: '1px dashed var(--border-hi)', borderRadius: '2px', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px', background: 'rgba(0,0,0,0.02)' }}>
+                                  <img src="/logo.png" alt="ID Document" style={{ height: '100%', objectFit: 'contain' }} />
+                                  <span style={{ fontSize: '8px', color: 'var(--text-mute)' }}>aadhaar_rohan_verma.jpg</span>
+                                </div>
+                              </div>
+                            </>
+                          )}
+
+                          {demoStep === 3 && (
+                            <>
+                              <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                                <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>SELECTED ROOM</label>
+                                <input type="text" readOnly value="Room 202" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                              </div>
+                              <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                                <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>ROOM TYPE</label>
+                                <input type="text" readOnly value="Suite" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                              </div>
+                              <div style={{ display: 'flex', gap: '2px', flexDirection: 'column' }}>
+                                <label style={{ fontSize: '8px', color: 'var(--text-mute)', fontWeight: 'bold' }}>NIGHTLY RATE</label>
+                                <input type="text" readOnly value="₹12,000 / night" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '2px 6px', fontSize: '9px', borderRadius: '2px', color: 'var(--text-sec)' }} />
+                              </div>
+                            </>
+                          )}
+
+                          {demoStep === 4 && (
+                            <>
+                              <div style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px solid var(--border)', padding: '6px', borderRadius: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                                  <span style={{ color: 'var(--text-mute)' }}>Guest:</span>
+                                  <span style={{ fontWeight: 'bold' }}>Rohan Verma</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                                  <span style={{ color: 'var(--text-mute)' }}>ID:</span>
+                                  <span>Aadhaar (Verified)</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                                  <span style={{ color: 'var(--text-mute)' }}>Room:</span>
+                                  <span style={{ fontWeight: 'bold' }}>Room 202 (Suite)</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                                  <span style={{ color: 'var(--text-mute)' }}>Total:</span>
+                                  <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>₹12,000 / night</span>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center', marginTop: '2px' }}>
+                                <span style={{ fontSize: '9px' }}>✅ Ready to Check-In</span>
+                              </div>
+                            </>
+                          )}
+
+                          {demoStep === 5 && (
                             <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: 0.2, type: 'spring', stiffness: 250, damping: 15 }}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ type: 'spring', duration: 0.5 }}
                               style={{
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '50%',
-                                background: 'rgba(16, 185, 129, 0.15)',
-                                color: '#10b981',
                                 display: 'flex',
+                                flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                fontSize: '20px',
-                                border: '2px solid #10b981',
-                                boxShadow: '0 0 15px rgba(16, 185, 129, 0.3)',
+                                gap: '8px',
+                                padding: '12px 0',
+                                textAlign: 'center',
+                                flex: 1,
                               }}
                             >
-                              ✓
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.2, type: 'spring', stiffness: 250, damping: 15 }}
+                                style={{
+                                  width: '40px',
+                                  height: '40px',
+                                  borderRadius: '50%',
+                                  background: 'rgba(16, 185, 129, 0.15)',
+                                  color: '#10b981',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '20px',
+                                  border: '2px solid #10b981',
+                                  boxShadow: '0 0 15px rgba(16, 185, 129, 0.3)',
+                                }}
+                              >
+                                ✓
+                              </motion.div>
+                              <motion.h3
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                style={{ fontSize: '13px', fontWeight: 800, margin: 0, color: 'var(--text-pri)' }}
+                              >
+                                Booking Done!
+                              </motion.h3>
+                              <motion.p
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                                style={{ fontSize: '9px', color: 'var(--text-sec)', margin: 0, maxWidth: '180px', lineHeight: 1.4 }}
+                              >
+                                That is all you need to do, it&apos;s as simple as that.
+                              </motion.p>
                             </motion.div>
-                            <motion.h3
-                              initial={{ opacity: 0, y: 5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.3 }}
-                              style={{ fontSize: '13px', fontWeight: 800, margin: 0, color: 'var(--text-pri)' }}
-                            >
-                              Booking Done!
-                            </motion.h3>
-                            <motion.p
-                              initial={{ opacity: 0, y: 5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.4 }}
-                              style={{ fontSize: '9px', color: 'var(--text-sec)', margin: 0, maxWidth: '180px', lineHeight: 1.4 }}
-                            >
-                              That is all you need to do, it&apos;s as simple as that.
-                            </motion.p>
-                          </motion.div>
-                        )}
-                      </div>
+                          )}
+                        </div>
 
-                      {/* Action Buttons */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '4px', borderTop: '1px solid var(--border)' }}>
-                        {demoStep === 5 ? (
-                          <button
-                            onClick={() => {
-                              setIsDemoCheckInOpen(false);
-                            }}
-                            style={{
-                              background: 'var(--accent)',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '2px',
-                              padding: '4px 12px',
-                              fontSize: '9px',
-                              fontWeight: 'bold',
-                              cursor: 'pointer',
-                              width: '100%',
-                              textAlign: 'center',
-                            }}
-                          >
-                            Done
-                          </button>
-                        ) : (
-                          <>
+                        {/* Action Buttons */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '4px', borderTop: '1px solid var(--border)' }}>
+                          {demoStep === 5 ? (
                             <button
                               onClick={() => {
+                                setIsDemoCheckInOpen(false);
+                              }}
+                              style={{
+                                background: 'var(--accent)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '2px',
+                                padding: '4px 12px',
+                                fontSize: '9px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                width: '100%',
+                                textAlign: 'center',
+                              }}
+                            >
+                              Done
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => {
                                   if (demoStep > 1) setDemoStep(demoStep - 1);
                                   else setIsDemoCheckInOpen(false);
-                              }}
-                              style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '2px', padding: '3px 8px', fontSize: '9px', cursor: 'pointer', color: 'var(--text-sec)' }}
-                            >
-                              {demoStep === 1 ? 'Cancel' : 'Back'}
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (demoStep < 4) {
-                                  setDemoStep(demoStep + 1);
-                                } else {
-                                  setDemoStep(5);
-                                }
-                              }}
-                              style={{ background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '2px', padding: '3px 8px', fontSize: '9px', fontWeight: 'bold', cursor: 'pointer' }}
-                            >
-                              {demoStep === 4 ? 'Confirm Booking' : 'Next'}
-                            </button>
+                                }}
+                                style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '2px', padding: '3px 8px', fontSize: '9px', cursor: 'pointer', color: 'var(--text-sec)' }}
+                              >
+                                {demoStep === 1 ? 'Cancel' : 'Back'}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (demoStep < 4) {
+                                    setDemoStep(demoStep + 1);
+                                  } else {
+                                    setDemoStep(5);
+                                  }
+                                }}
+                                style={{ background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '2px', padding: '3px 8px', fontSize: '9px', fontWeight: 'bold', cursor: 'pointer' }}
+                              >
+                                {demoStep === 4 ? 'Confirm Booking' : 'Next'}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.15 }}
+                        style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}
+                      >
+                        {activeTab === 'Dashboard' && (
+                          <>
+                            <div className="lp-mini-stats-row">
+                              {[
+                                { label: 'Total Rooms', val: '48', color: 'blue' },
+                                { label: 'Available', val: '31', color: 'green' },
+                                { label: 'Occupied', val: '17', color: 'amber' },
+                              ].map(s => (
+                                <div key={s.label} className={`lp-mini-stat lp-mini-stat-${s.color}`}>
+                                  <div className="lp-mini-stat-val">{s.val}</div>
+                                  <div className="lp-mini-stat-lbl">{s.label}</div>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="lp-mini-table-head">
+                              <span>Recent Check-ins</span>
+                              <span className="lp-mini-badge">Live</span>
+                            </div>
+                            {[
+                              { name: 'Aarav Sharma', room: '204', time: '2m ago' },
+                              { name: 'Priya Mehta', room: '310', time: '18m ago' },
+                              { name: 'Raj Patel', room: '101', time: '1h ago' },
+                              { name: 'Siddharth Rao', room: '402', time: '2h ago' },
+                              { name: 'Neha Iyer', room: '215', time: '5h ago' },
+                            ].map(g => (
+                              <div key={g.name} className="lp-mini-row">
+                                <div className="lp-mini-avatar">{g.name[0]}</div>
+                                <div className="lp-mini-info">
+                                  <span className="lp-mini-name">{g.name}</span>
+                                  <span className="lp-mini-room">Room {g.room}</span>
+                                </div>
+                                <span className="lp-mini-time">{g.time}</span>
+                              </div>
+                            ))}
                           </>
                         )}
-                      </div>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key={activeTab}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.15 }}
-                      style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}
-                    >
-                    {activeTab === 'Dashboard' && (
-                      <>
-                        <div className="lp-mini-stats-row">
-                          {[
-                            { label: 'Total Rooms', val: '48', color: 'blue' },
-                            { label: 'Available', val: '31', color: 'green' },
-                            { label: 'Occupied', val: '17', color: 'amber' },
-                          ].map(s => (
-                            <div key={s.label} className={`lp-mini-stat lp-mini-stat-${s.color}`}>
-                              <div className="lp-mini-stat-val">{s.val}</div>
-                              <div className="lp-mini-stat-lbl">{s.label}</div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="lp-mini-table-head">
-                          <span>Recent Check-ins</span>
-                          <span className="lp-mini-badge">Live</span>
-                        </div>
-                        {[
-                          { name: 'Aarav Sharma', room: '204', time: '2m ago' },
-                          { name: 'Priya Mehta', room: '310', time: '18m ago' },
-                          { name: 'Raj Patel', room: '101', time: '1h ago' },
-                          { name: 'Siddharth Rao', room: '402', time: '2h ago' },
-                          { name: 'Neha Iyer', room: '215', time: '5h ago' },
-                        ].map(g => (
-                          <div key={g.name} className="lp-mini-row">
-                            <div className="lp-mini-avatar">{g.name[0]}</div>
-                            <div className="lp-mini-info">
-                              <span className="lp-mini-name">{g.name}</span>
-                              <span className="lp-mini-room">Room {g.room}</span>
-                            </div>
-                            <span className="lp-mini-time">{g.time}</span>
-                          </div>
-                        ))}
-                      </>
-                    )}
 
-                    {activeTab === 'Rooms' && (
-                      <>
-                        <div className="lp-mini-table-head">
-                          <span>Live Room Grid</span>
-                          <span className="lp-mini-badge">Live</span>
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                          {[
-                            { num: '101', status: 'occupied', label: 'Deluxe' },
-                            { num: '102', status: 'available', label: 'Suite' },
-                            { num: '103', status: 'maintenance', label: 'Standard' },
-                            { num: '201', status: 'available', label: 'Deluxe' },
-                            { num: '202', status: 'occupied', label: 'Suite' },
-                            { num: '203', status: 'available', label: 'Standard' },
-                          ].map(r => (
-                            <div key={r.num} style={{
-                              padding: '8px',
-                              borderRadius: 'var(--r-sm)',
-                              background: 'var(--surface)',
-                              border: '1px solid var(--border)',
-                              textAlign: 'center',
-                              fontSize: '10px'
-                            }}>
-                              <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{r.num}</div>
-                              <div style={{ fontSize: '8px', color: 'var(--text-mute)', marginBottom: '4px' }}>{r.label}</div>
-                              <span className={`badge badge-${r.status === 'available' ? 'green' : r.status === 'occupied' ? 'amber' : 'red'}`} style={{ fontSize: '8px', padding: '1px 4px' }}>
-                                {r.status}
-                              </span>
+                        {activeTab === 'Rooms' && (
+                          <>
+                            <div className="lp-mini-table-head">
+                              <span>Live Room Grid</span>
+                              <span className="lp-mini-badge">Live</span>
                             </div>
-                          ))}
-                        </div>
-                      </>
-                    )}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                              {[
+                                { num: '101', status: 'occupied', label: 'Deluxe' },
+                                { num: '102', status: 'available', label: 'Suite' },
+                                { num: '103', status: 'maintenance', label: 'Standard' },
+                                { num: '201', status: 'available', label: 'Deluxe' },
+                                { num: '202', status: 'occupied', label: 'Suite' },
+                                { num: '203', status: 'available', label: 'Standard' },
+                              ].map(r => (
+                                <div key={r.num} style={{
+                                  padding: '8px',
+                                  borderRadius: 'var(--r-sm)',
+                                  background: 'var(--surface)',
+                                  border: '1px solid var(--border)',
+                                  textAlign: 'center',
+                                  fontSize: '10px'
+                                }}>
+                                  <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{r.num}</div>
+                                  <div style={{ fontSize: '8px', color: 'var(--text-mute)', marginBottom: '4px' }}>{r.label}</div>
+                                  <span className={`badge badge-${r.status === 'available' ? 'green' : r.status === 'occupied' ? 'amber' : 'red'}`} style={{ fontSize: '8px', padding: '1px 4px' }}>
+                                    {r.status}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
 
-                    {activeTab === 'Bookings' && (
-                      <>
-                        <div className="lp-mini-table-head" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                          <span>Active Bookings</span>
-                          <button
-                            onClick={() => {
-                              setIsDemoCheckInOpen(true);
-                              setDemoStep(1);
-                            }}
-                            style={{
-                              background: 'var(--accent)',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '4px',
-                              padding: '2px 8px',
-                              fontSize: '8px',
-                              fontWeight: 'bold',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              height: '16px',
-                            }}
-                          >
-                            + Add Booking
-                          </button>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          {[
-                            { guest: 'Aarav Sharma', room: '204', rate: '₹9,600', status: 'Confirmed' },
-                            { guest: 'Priya Mehta', room: '310', rate: '₹12,000', status: 'Active' },
-                            { guest: 'Kabir Sen', room: '105', rate: '₹7,600', status: 'Pending' },
-                            { guest: 'Siddharth Rao', room: '402', rate: '₹14,400', status: 'Confirmed' },
-                            { guest: 'Neha Iyer', room: '215', rate: '₹8,800', status: 'Active' },
-                            { guest: 'Aditya Verma', room: '303', rate: '₹10,800', status: 'Pending' },
-                          ].map((b, i) => (
-                            <div key={i} style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              padding: '8px var(--sp-sm)',
-                              borderRadius: 'var(--r-sm)',
-                              background: 'var(--surface)',
-                              border: '1px solid var(--border)',
-                              fontSize: '11px'
-                            }}>
-                              <div>
-                                <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{b.guest}</div>
-                                <div style={{ fontSize: '9px', color: 'var(--text-mute)' }}>Room {b.room} • {b.rate}/night</div>
-                              </div>
-                              <span className={`badge badge-${b.status === 'Active' ? 'green' : b.status === 'Confirmed' ? 'blue' : 'amber'}`} style={{ fontSize: '8px', padding: '2px 6px' }}>
-                                {b.status}
-                              </span>
+                        {activeTab === 'Bookings' && (
+                          <>
+                            <div className="lp-mini-table-head" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                              <span>Active Bookings</span>
+                              <button
+                                onClick={() => {
+                                  setIsDemoCheckInOpen(true);
+                                  setDemoStep(1);
+                                }}
+                                style={{
+                                  background: 'var(--accent)',
+                                  color: '#fff',
+                                  border: 'none',
+                                  borderRadius: '4px',
+                                  padding: '2px 8px',
+                                  fontSize: '8px',
+                                  fontWeight: 'bold',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  height: '16px',
+                                }}
+                              >
+                                + Add Booking
+                              </button>
                             </div>
-                          ))}
-                        </div>
-                      </>
-                    )}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {[
+                                { guest: 'Aarav Sharma', room: '204', rate: '₹9,600', status: 'Confirmed' },
+                                { guest: 'Priya Mehta', room: '310', rate: '₹12,000', status: 'Active' },
+                                { guest: 'Kabir Sen', room: '105', rate: '₹7,600', status: 'Pending' },
+                                { guest: 'Siddharth Rao', room: '402', rate: '₹14,400', status: 'Confirmed' },
+                                { guest: 'Neha Iyer', room: '215', rate: '₹8,800', status: 'Active' },
+                                { guest: 'Aditya Verma', room: '303', rate: '₹10,800', status: 'Pending' },
+                              ].map((b, i) => (
+                                <div key={i} style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  padding: '8px var(--sp-sm)',
+                                  borderRadius: 'var(--r-sm)',
+                                  background: 'var(--surface)',
+                                  border: '1px solid var(--border)',
+                                  fontSize: '11px'
+                                }}>
+                                  <div>
+                                    <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{b.guest}</div>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-mute)' }}>Room {b.room} • {b.rate}/night</div>
+                                  </div>
+                                  <span className={`badge badge-${b.status === 'Active' ? 'green' : b.status === 'Confirmed' ? 'blue' : 'amber'}`} style={{ fontSize: '8px', padding: '2px 6px' }}>
+                                    {b.status}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
 
-                    {activeTab === 'Employees' && (
-                      <>
-                        <div className="lp-mini-table-head">
-                          <span>Hotel Staff Roles</span>
-                          <span className="lp-mini-badge">Live</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          {[
-                            { name: 'Amit Sharma', role: 'Owner', weight: '50', color: 'blue' },
-                            { name: 'Neha Patel', role: 'Manager', weight: '30', color: 'amber' },
-                            { name: 'Rohan Das', role: 'Staff', weight: '10', color: 'green' },
-                            { name: 'Vikram Malhotra', role: 'Staff', weight: '10', color: 'green' },
-                            { name: 'Sandeep Reddy', role: 'Staff', weight: '10', color: 'green' },
-                          ].map((emp, i) => (
-                            <div key={i} style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              padding: '8px var(--sp-sm)',
-                              borderRadius: 'var(--r-sm)',
-                              background: 'var(--surface)',
-                              border: '1px solid var(--border)',
-                              fontSize: '11px'
-                            }}>
-                              <div>
-                                <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{emp.name}</div>
-                                <div style={{ fontSize: '9px', color: 'var(--text-mute)' }}>{emp.role}</div>
-                              </div>
-                              <span className={`badge badge-${emp.color}`} style={{ fontSize: '8px', padding: '2px 6px' }}>
-                                W: {emp.weight}
-                              </span>
+                        {activeTab === 'Employees' && (
+                          <>
+                            <div className="lp-mini-table-head">
+                              <span>Hotel Staff Roles</span>
+                              <span className="lp-mini-badge">Live</span>
                             </div>
-                          ))}
-                        </div>
-                      </>
-                    )}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {[
+                                { name: 'Amit Sharma', role: 'Owner', weight: '50', color: 'blue' },
+                                { name: 'Neha Patel', role: 'Manager', weight: '30', color: 'amber' },
+                                { name: 'Rohan Das', role: 'Staff', weight: '10', color: 'green' },
+                                { name: 'Vikram Malhotra', role: 'Staff', weight: '10', color: 'green' },
+                                { name: 'Sandeep Reddy', role: 'Staff', weight: '10', color: 'green' },
+                              ].map((emp, i) => (
+                                <div key={i} style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  padding: '8px var(--sp-sm)',
+                                  borderRadius: 'var(--r-sm)',
+                                  background: 'var(--surface)',
+                                  border: '1px solid var(--border)',
+                                  fontSize: '11px'
+                                }}>
+                                  <div>
+                                    <div style={{ fontWeight: 'bold', color: 'var(--text-pri)' }}>{emp.name}</div>
+                                    <div style={{ fontSize: '9px', color: 'var(--text-mute)' }}>{emp.role}</div>
+                                  </div>
+                                  <span className={`badge badge-${emp.color}`} style={{ fontSize: '8px', padding: '2px 6px' }}>
+                                    W: {emp.weight}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
 
-                    {activeTab === 'Logs' && (
-                      <>
-                        <div className="lp-mini-table-head">
-                          <span>Activity Log</span>
-                          <span className="lp-mini-badge">Live</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                          {[
-                            { action: 'Vikram Malhotra check-in Aarav Sharma', time: '2m ago', icon: '🔑' },
-                            { action: 'Sandeep Reddy checkout Neha Iyer', time: '15m ago', icon: '🚪' },
-                            { action: 'Neha Patel override rate Room 310', time: '1h ago', icon: '💰' },
-                            { action: 'Amit Sharma updated settings', time: '4h ago', icon: '⚙️' },
-                            { action: 'Rohan Das allocated Room 201', time: '6h ago', icon: '🛌' },
-                          ].map((log, i) => (
-                            <div key={i} style={{
-                              display: 'flex',
-                              alignItems: 'flex-start',
-                              gap: '8px',
-                              padding: '6px 8px',
-                              borderRadius: 'var(--r-xs)',
-                              background: 'var(--surface)',
-                              border: '1px solid var(--border)',
-                              fontSize: '10px'
-                            }}>
-                              <span style={{ fontSize: '12px' }}>{log.icon}</span>
-                              <div style={{ flex: 1 }}>
-                                <div style={{ color: 'var(--text-pri)', lineHeight: '1.3' }}>{log.action}</div>
-                                <div style={{ fontSize: '8px', color: 'var(--text-mute)', marginTop: '2px' }}>{log.time}</div>
-                              </div>
+                        {activeTab === 'Logs' && (
+                          <>
+                            <div className="lp-mini-table-head">
+                              <span>Activity Log</span>
+                              <span className="lp-mini-badge">Live</span>
                             </div>
-                          ))}
-                        </div>
-                      </>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {[
+                                { action: 'Vikram Malhotra check-in Aarav Sharma', time: '2m ago', icon: '🔑' },
+                                { action: 'Sandeep Reddy checkout Neha Iyer', time: '15m ago', icon: '🚪' },
+                                { action: 'Neha Patel override rate Room 310', time: '1h ago', icon: '💰' },
+                                { action: 'Amit Sharma updated settings', time: '4h ago', icon: '⚙️' },
+                                { action: 'Rohan Das allocated Room 201', time: '6h ago', icon: '🛌' },
+                              ].map((log, i) => (
+                                <div key={i} style={{
+                                  display: 'flex',
+                                  alignItems: 'flex-start',
+                                  gap: '8px',
+                                  padding: '6px 8px',
+                                  borderRadius: 'var(--r-xs)',
+                                  background: 'var(--surface)',
+                                  border: '1px solid var(--border)',
+                                  fontSize: '10px'
+                                }}>
+                                  <span style={{ fontSize: '12px' }}>{log.icon}</span>
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ color: 'var(--text-pri)', lineHeight: '1.3' }}>{log.action}</div>
+                                    <div style={{ fontSize: '8px', color: 'var(--text-mute)', marginTop: '2px' }}>{log.time}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </motion.div>
                     )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>
-        </div>
         </motion.div>
       </section>
 
@@ -1574,124 +1577,124 @@ export default function LandingPage() {
             </p>
           </div>
 
-        <div className="lp-flow-grid" style={{ marginTop: '8px' }}>
-          {[
-            {
-              num: '01',
-              title: 'Guest Details',
-              desc: 'Enter name, age, phone number and crop a live photo for guest record.',
-            },
-            {
-              num: '02',
-              title: 'Upload ID Proof',
-              desc: 'Attach the group ID document and enter the ID number for verification.',
-            },
-            {
-              num: '03',
-              title: 'Select Room',
-              desc: 'Pick from the live grid of available rooms. Multi-room bookings supported.',
-            },
-            {
-              num: '04',
-              title: 'Review & Confirm',
-              desc: 'Set custom nightly rate, pick payment mode, then commit the booking.',
-            },
-          ].map((step, idx) => (
-            <TiltCard
-              key={idx}
-              className="lp-flow-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 * idx }}
-              whileHover={{ scale: 1.03 }}
-            >
-              <div className="lp-flow-num">{step.num}</div>
-              <h3 className="lp-flow-title">{step.title}</h3>
-              <p className="lp-flow-desc">{step.desc}</p>
-              {idx < 3 && <div className="lp-flow-arrow">→</div>}
-            </TiltCard>
-          ))}
-        </div>
-
-        {/* Access Control segment */}
-        <div style={{ marginTop: '12px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '0px' }}>
-            <h2 style={{ fontSize: 'var(--fs-md)', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '2px' }}>
-              Access Control
-            </h2>
-            <p style={{ fontSize: '11px', color: 'var(--text-mute)', margin: '0' }}>
-              The Right Access for the Right Person
-            </p>
+          <div className="lp-flow-grid" style={{ marginTop: '8px' }}>
+            {[
+              {
+                num: '01',
+                title: 'Guest Details',
+                desc: 'Enter name, age, phone number and crop a live photo for guest record.',
+              },
+              {
+                num: '02',
+                title: 'Upload ID Proof',
+                desc: 'Attach the group ID document and enter the ID number for verification.',
+              },
+              {
+                num: '03',
+                title: 'Select Room',
+                desc: 'Pick from the live grid of available rooms. Multi-room bookings supported.',
+              },
+              {
+                num: '04',
+                title: 'Review & Confirm',
+                desc: 'Set custom nightly rate, pick payment mode, then commit the booking.',
+              },
+            ].map((step, idx) => (
+              <TiltCard
+                key={idx}
+                className="lp-flow-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 * idx }}
+                whileHover={{ scale: 1.03 }}
+              >
+                <div className="lp-flow-num">{step.num}</div>
+                <h3 className="lp-flow-title">{step.title}</h3>
+                <p className="lp-flow-desc">{step.desc}</p>
+                {idx < 3 && <div className="lp-flow-arrow">→</div>}
+              </TiltCard>
+            ))}
           </div>
 
-          <div className="lp-roles-grid" style={{ marginTop: '8px' }}>
-          {[
-            {
-              role: 'Hotel Owner',
-              class: 'role-owner',
-              icon: '🏨',
-              weight: 50,
-              permissions: [
-                'Full hotel control',
-                'Invite key management',
-                'Employee management',
-                'Settings & billing',
-              ],
-            },
-            {
-              role: 'Manager',
-              class: 'role-manager',
-              icon: '🗝️',
-              weight: 30,
-              permissions: [
-                'Add & edit rooms',
-                'Maintenance control',
-                'Staff management',
-                'View all bookings',
-              ],
-            },
-            {
-              role: 'Staff',
-              class: 'role-staff',
-              icon: '🛎️',
-              weight: 10,
-              permissions: [
-                'Process check-ins',
-                'Execute checkouts',
-                'View active bookings',
-                'Room status view',
-              ],
-            },
-          ].map((role, idx) => (
-            <TiltCard
-              key={idx}
-              className={`lp-role-card ${role.class}`}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 * idx }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="lp-role-header">
-                <div className="lp-role-title-row">
-                  <span className="lp-role-icon">{role.icon}</span>
-                  <h3 className="lp-role-title">{role.role}</h3>
-                </div>
-                <div className="lp-role-weight">Weight: {role.weight}</div>
-              </div>
-              <ul className="lp-role-list">
-                {role.permissions.map((perm, pIdx) => (
-                  <li key={pIdx} className="lp-role-item">
-                    <span className="lp-role-check">✓</span>
-                    <span>{perm}</span>
-                  </li>
-                ))}
-              </ul>
-            </TiltCard>
-          ))}
-        </div>
-        </div>
+          {/* Access Control segment */}
+          <div style={{ marginTop: '12px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '0px' }}>
+              <h2 style={{ fontSize: 'var(--fs-md)', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '2px' }}>
+                Access Control
+              </h2>
+              <p style={{ fontSize: '11px', color: 'var(--text-mute)', margin: '0' }}>
+                The Right Access for the Right Person
+              </p>
+            </div>
+
+            <div className="lp-roles-grid" style={{ marginTop: '8px' }}>
+              {[
+                {
+                  role: 'Hotel Owner',
+                  class: 'role-owner',
+                  icon: '🏨',
+                  weight: 50,
+                  permissions: [
+                    'Full hotel control',
+                    'Invite key management',
+                    'Employee management',
+                    'Settings & billing',
+                  ],
+                },
+                {
+                  role: 'Manager',
+                  class: 'role-manager',
+                  icon: '🗝️',
+                  weight: 30,
+                  permissions: [
+                    'Add & edit rooms',
+                    'Maintenance control',
+                    'Staff management',
+                    'View all bookings',
+                  ],
+                },
+                {
+                  role: 'Staff',
+                  class: 'role-staff',
+                  icon: '🛎️',
+                  weight: 10,
+                  permissions: [
+                    'Process check-ins',
+                    'Execute checkouts',
+                    'View active bookings',
+                    'Room status view',
+                  ],
+                },
+              ].map((role, idx) => (
+                <TiltCard
+                  key={idx}
+                  className={`lp-role-card ${role.class}`}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.1 * idx }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="lp-role-header">
+                    <div className="lp-role-title-row">
+                      <span className="lp-role-icon">{role.icon}</span>
+                      <h3 className="lp-role-title">{role.role}</h3>
+                    </div>
+                    <div className="lp-role-weight">Weight: {role.weight}</div>
+                  </div>
+                  <ul className="lp-role-list">
+                    {role.permissions.map((perm, pIdx) => (
+                      <li key={pIdx} className="lp-role-item">
+                        <span className="lp-role-check">✓</span>
+                        <span>{perm}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </TiltCard>
+              ))}
+            </div>
+          </div>
         </motion.div>
       </section>
 
@@ -1709,56 +1712,55 @@ export default function LandingPage() {
             zIndex: 10,
           }}
         >
-        <div
-          className="glass-card"
-          style={{
-            padding: 'var(--sp-xl)',
-            borderRadius: 'var(--r-lg)',
-            border: '1px solid var(--glass-border)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--sp-lg)',
-          }}
-        >
-          <div style={{ textAlign: 'center' }}>
-            <h2 style={{ fontSize: 'var(--fs-xl)', fontWeight: 900, letterSpacing: '-0.5px' }}>
-              Why SyncZen Outperforms Legacy Systems
-            </h2>
-            <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', margin: 'var(--sp-xs) 0 0 0' }}>
-              Designed from the ground up for modern, cloud-first hospitality teams.
-            </p>
-          </div>
+          <div
+            className="glass-card"
+            style={{
+              padding: 'var(--sp-xl)',
+              borderRadius: 'var(--r-lg)',
+              border: '1px solid var(--glass-border)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--sp-lg)',
+            }}
+          >
+            <div style={{ textAlign: 'center' }}>
+              <h2 style={{ fontSize: 'var(--fs-xl)', fontWeight: 900, letterSpacing: '-0.5px' }}>
+                Why SyncZen Outperforms Legacy Systems
+              </h2>
+              <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', margin: 'var(--sp-xs) 0 0 0' }}>
+                Designed from the ground up for modern, cloud-first hospitality teams.
+              </p>
+            </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  <th style={{ textAlign: 'left', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>Capability</th>
-                  <th style={{ textAlign: 'center', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>Legacy PMS</th>
-                  <th style={{ textAlign: 'center', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 800 }}>SyncZen Cloud</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { name: 'Check-In Logging', legacy: 'Complex multi-tab forms', modern: 'Smooth 4-step check-in wizard' },
-                  { name: 'Guest Avatars', legacy: 'Manual scanners / local files', modern: 'In-browser crop & secure CDN storage' },
-                  { name: 'Device Pairing', legacy: 'Complex physical serial-port wiring', modern: 'Pair mobile companion via QR code' },
-                  { name: 'Audit Trails', legacy: 'None or hidden inside flat logs', modern: 'Dynamic and easy to access activity logger' },
-                  { name: 'Room Rates', legacy: 'Locked standard price tags', modern: 'On-the-fly custom overrides' },
-                  { name: 'Offline Operations', legacy: 'Complete downtime on connection loss', modern: 'Seamless local workstation fallback' },
-                ].map((row, idx) => (
-                  <tr key={idx} style={{ borderBottom: idx < 5 ? '1px solid var(--border)' : 'none' }}>
-                    <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{row.name}</td>
-                    <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', textAlign: 'center' }}>{row.legacy}</td>
-                    <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-pri)', fontWeight: 700, textAlign: 'center' }}>
-                      {row.modern}
-                    </td>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <th style={{ textAlign: 'left', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>Capability</th>
+                    <th style={{ textAlign: 'center', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--text-mute)' }}>Legacy PMS</th>
+                    <th style={{ textAlign: 'center', padding: '12px', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 800 }}>SyncZen Cloud</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {[
+                    { name: 'Check-In Logging', legacy: 'Complex multi-tab forms', modern: 'Smooth 4-step check-in wizard' },
+                    { name: 'Guest Avatars', legacy: 'Manual scanners / local files', modern: 'In-browser crop & secure CDN storage' },
+                    { name: 'Data Analytics', legacy: 'Static end-of-day printouts', modern: 'Live interactive dashboard analytics' },
+                    { name: 'Audit Trails', legacy: 'None or hidden inside flat logs', modern: 'Dynamic and easy to access activity logger' },
+                    { name: 'Room Rates', legacy: 'Locked standard price tags', modern: 'On-the-fly custom overrides' },
+                  ].map((row, idx) => (
+                    <tr key={idx} style={{ borderBottom: idx < 5 ? '1px solid var(--border)' : 'none' }}>
+                      <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{row.name}</td>
+                      <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', textAlign: 'center' }}>{row.legacy}</td>
+                      <td style={{ padding: '14px 12px', fontSize: 'var(--fs-sm)', color: 'var(--text-pri)', fontWeight: 700, textAlign: 'center' }}>
+                        {row.modern}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
         </motion.div>
       </section>
 
@@ -1771,107 +1773,109 @@ export default function LandingPage() {
           transition={{ duration: 0.6 }}
           style={{ width: '100%', maxWidth: '1200px', padding: '0 var(--sp-2xl)', zIndex: 10 }}
         >
-        <div
-          className="glass-card"
-          style={{
-            padding: 'var(--sp-xl)',
-            borderRadius: 'var(--r-xl)',
-            border: '1px solid rgba(124, 58, 237, 0.15)',
-            background: 'linear-gradient(135deg, var(--surface) 0%, rgba(124, 58, 237, 0.03) 100%)',
-          }}
-        >
-          <div className="local-promo-grid">
-            {/* Left Column: Local App Information */}
-            <div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                <span className="local-promo-badge">Offline & Local-First</span>
-                <h2 className="local-promo-title">
-                  SyncZen Local Station
-                </h2>
-              </div>
-              <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-sec)', lineHeight: 1.6, margin: '0 0 var(--sp-md) 0' }}>
-                Need to run without internet dependency or external servers? <strong>SyncZen Local</strong> is a fully standalone offline workstation. It couples a native Electron desktop app with companion mobile check-in assistant devices over your local WiFi network.
-              </p>
-              
-              <div className="local-feature-list">
-                <div className="local-feature-item">
-                  <div className="local-feature-icon">🖥️</div>
-                  <div className="local-feature-text">
-                    <div className="local-feature-heading">Electron Desktop Workstation</div>
-                    Central hotel operations cockpit running a React + Vite frontend with an in-memory WebAssembly SQLite database (sql.js) and auto-backups directly to disk (synczen.db).
-                  </div>
-                </div>
-                <div className="local-feature-item">
-                  <div className="local-feature-icon">📱</div>
-                  <div className="local-feature-text">
-                    <div className="local-feature-heading">Mobile Companion Assistant</div>
-                    Expo React Native mobile app. Devices connect securely by scanning a pairing QR code generated on the desktop, enabling camera photo capturing of guest profiles.
-                  </div>
-                </div>
-                <div className="local-feature-item">
-                  <div className="local-feature-icon">🔄</div>
-                  <div className="local-feature-text">
-                    <div className="local-feature-heading">Offline Sync Engine</div>
-                    Buffers bookings and guest photos as base64 in AsyncStorage when devices are out of WiFi range. A background loop automatically flushes the queue every 15 seconds once online.
-                  </div>
-                </div>
-                <div className="local-feature-item">
-                  <div className="local-feature-icon">🛡️</div>
-                  <div className="local-feature-text">
-                    <div className="local-feature-heading">Complete Data Privacy</div>
-                    All guest records, documents, and logs remain strictly on your own hardware inside your building. Zero cloud hosting, zero data leaks, and zero downtime.
-                  </div>
-                </div>
-              </div>
+          <div
+            className="glass-card"
+            style={{
+              padding: 'var(--sp-xl)',
+              borderRadius: 'var(--r-xl)',
+              border: '1px solid rgba(124, 58, 237, 0.15)',
+              background: 'linear-gradient(135deg, var(--surface) 0%, rgba(124, 58, 237, 0.03) 100%)',
+            }}
+          >
+            {/* Centered Header Block (outside the grid to center relative to the entire card) */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 'var(--sp-lg)' }}>
+              <span className="local-promo-badge">Offline & Local-First</span>
+              <h2 className="local-promo-title" style={{ marginBottom: 0 }}>
+                SyncZen Local Station
+              </h2>
             </div>
 
-            {/* Right Column: Connection Workflow and Download Actions */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}>
-              <div className="local-flow-steps">
-                <h4 style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, margin: '0 0 var(--sp-xs) 0', color: 'var(--text-pri)' }}>
-                  How Local Mode Works:
-                </h4>
-                <div className="local-flow-step">
-                  <div className="local-flow-number">1</div>
-                  <span>Launch desktop app to boot SQLite & LAN Express API</span>
-                </div>
-                <div className="local-flow-step">
-                  <div className="local-flow-number">2</div>
-                  <span>Scan Pairing QR Code from mobile app to pair devices</span>
-                </div>
-                <div className="local-flow-step">
-                  <div className="local-flow-number">3</div>
-                  <span>Register guests and take photos offline on the mobile assistant</span>
-                </div>
-                <div className="local-flow-step">
-                  <div className="local-flow-number">4</div>
-                  <span>Bookings automatically queue and sync to desktop database</span>
+            <div className="local-promo-grid">
+              {/* Left Column: Local App Information */}
+              <div>
+                <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-sec)', lineHeight: 1.6, margin: '0 0 var(--sp-md) 0' }}>
+                  Need to run without internet dependency or external servers? <strong>SyncZen Local</strong> is a fully standalone offline workstation. It couples a native Electron desktop app with companion mobile check-in assistant devices over your local WiFi network.
+                </p>
+
+                <div className="local-feature-list">
+                  <div className="local-feature-item">
+                    <div className="local-feature-icon">🖥️</div>
+                    <div className="local-feature-text">
+                      <div className="local-feature-heading">Electron Desktop Workstation</div>
+                      Central hotel operations cockpit running a React + Vite frontend with an in-memory WebAssembly SQLite database (sql.js) and auto-backups directly to disk (synczen.db).
+                    </div>
+                  </div>
+                  <div className="local-feature-item">
+                    <div className="local-feature-icon">📱</div>
+                    <div className="local-feature-text">
+                      <div className="local-feature-heading">Mobile Companion Assistant</div>
+                      Expo React Native mobile app. Devices connect securely by scanning a pairing QR code generated on the desktop, enabling camera photo capturing of guest profiles.
+                    </div>
+                  </div>
+                  <div className="local-feature-item">
+                    <div className="local-feature-icon">🔄</div>
+                    <div className="local-feature-text">
+                      <div className="local-feature-heading">Offline Sync Engine</div>
+                      Buffers bookings and guest photos as base64 in AsyncStorage when devices are out of WiFi range. A background loop automatically flushes the queue every 15 seconds once online.
+                    </div>
+                  </div>
+                  <div className="local-feature-item">
+                    <div className="local-feature-icon">🛡️</div>
+                    <div className="local-feature-text">
+                      <div className="local-feature-heading">Complete Data Privacy</div>
+                      All guest records, documents, and logs remain strictly on your own hardware inside your building. Zero cloud hosting, zero data leaks, and zero downtime.
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-sm)', marginTop: 'var(--sp-xs)' }}>
-                <a
-                  href="https://github.com/Felix-au/SyncZen-Local/releases/latest"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="local-btn-download"
-                  id="download-local-btn"
-                >
-                  📥 Download Latest Release (v1.0.0)
-                </a>
-                <a
-                  href="https://github.com/Felix-au/SyncZen-Local"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="local-btn-github"
-                  id="github-local-repo-btn"
-                >
-                  📄 View GitHub Repository
-                </a>
+              {/* Right Column: Connection Workflow and Download Actions */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-md)' }}>
+                <div className="local-flow-steps">
+                  <h4 style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, margin: '0 0 var(--sp-xs) 0', color: 'var(--text-pri)' }}>
+                    How Local Mode Works:
+                  </h4>
+                  <div className="local-flow-step">
+                    <div className="local-flow-number">1</div>
+                    <span>Launch desktop app to boot SQLite & LAN Express API</span>
+                  </div>
+                  <div className="local-flow-step">
+                    <div className="local-flow-number">2</div>
+                    <span>Scan Pairing QR Code from mobile app to pair devices</span>
+                  </div>
+                  <div className="local-flow-step">
+                    <div className="local-flow-number">3</div>
+                    <span>Perform check-ins on either the desktop or the mobile</span>
+                  </div>
+                  <div className="local-flow-step">
+                    <div className="local-flow-number">4</div>
+                    <span>Bookings automatically queue and sync to desktop database</span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-sm)', marginTop: 'var(--sp-xs)' }}>
+                  <a
+                    href="https://github.com/Felix-au/SyncZen-Local/releases/latest"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="local-btn-download"
+                    id="download-local-btn"
+                  >
+                    📥 Download Latest Release (v1.0.0)
+                  </a>
+                  <a
+                    href="https://github.com/Felix-au/SyncZen-Local"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="local-btn-github"
+                    id="github-local-repo-btn"
+                  >
+                    📄 View GitHub Repository
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
         </motion.div>
       </section>
 
@@ -1910,7 +1914,7 @@ export default function LandingPage() {
             className="footer-link"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
             </svg>
             <span>GitHub</span>
           </a>
