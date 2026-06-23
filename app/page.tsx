@@ -64,31 +64,26 @@ export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = (e: Event) => {
-      const target = e.target as HTMLElement | null;
-      const scrollTop = target ? (target.scrollTop ?? window.scrollY) : window.scrollY;
-      if (scrollTop > 50) {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
         setIsScrolled(true)
       } else {
         setIsScrolled(false)
       }
     }
-    window.addEventListener('scroll', handleScroll, true)
-    return () => window.removeEventListener('scroll', handleScroll, true)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (
     <div
-      className="scroll-container"
       style={{
-        minHeight: '100vh',
         background: 'var(--bg)',
         color: 'var(--text-pri)',
         fontFamily: 'var(--font-sans)',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        overflow: 'hidden',
         transition: 'background var(--t-slow), color var(--t-slow)',
       }}
     >
@@ -742,11 +737,11 @@ export default function LandingPage() {
 
         /* Scroll Snap Slide System */
         @media (min-width: 901px) {
-          .scroll-container {
-            height: 100vh;
-            overflow-y: auto;
+          html, body {
             scroll-snap-type: y mandatory;
             scroll-behavior: smooth;
+            overflow-y: scroll;
+            height: 100%;
           }
           .slide-section {
             height: 100vh;
@@ -763,11 +758,6 @@ export default function LandingPage() {
           }
         }
         @media (max-width: 900px) {
-          .scroll-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-          }
           .slide-section {
             width: 100%;
             padding: var(--sp-xl) var(--sp-md);
@@ -837,7 +827,7 @@ export default function LandingPage() {
 
       {/* Navigation Header */}
       <header className={`landing-nav ${isScrolled ? 'scrolled-pill' : ''}`}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-sm)' }}>
+        <a href="#hero" style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-sm)', textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}>
           <Image
             src="/logo.png"
             alt="SyncZen"
@@ -846,7 +836,7 @@ export default function LandingPage() {
             style={{ borderRadius: 'var(--r-sm)', objectFit: 'contain' }}
           />
           <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px' }}>SyncZen</span>
-        </div>
+        </a>
 
         {/* Navigation links to jump to slides */}
         <nav className="nav-links">
@@ -1034,20 +1024,20 @@ export default function LandingPage() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 'var(--sp-sm)',
+            gap: '8px',
           }}
         >
-        <div style={{ textAlign: 'center', marginBottom: 'var(--sp-xs)' }}>
-          <h2 style={{ fontSize: 'var(--fs-xl)', fontWeight: 900, letterSpacing: '-0.5px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '4px' }}>
+          <h2 style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '2px' }}>
             Interactive Operations Dashboard
           </h2>
-          <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-mute)', margin: 'var(--sp-xs) 0 0 0' }}>
+          <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: '0' }}>
             A unified center featuring live status statistics and real-time hotel activity logs.
           </p>
         </div>
 
         {/* Dashboard preview card */}
-        <div className="lp-hero-preview">
+        <div className="lp-hero-preview" style={{ marginTop: '0px' }}>
           <div className="lp-preview-card">
             <div className="lp-preview-bar">
               <span className="lp-preview-dot red" />
@@ -1103,6 +1093,8 @@ export default function LandingPage() {
                           { name: 'Aarav Sharma', room: '204', time: '2m ago' },
                           { name: 'Priya Mehta', room: '310', time: '18m ago' },
                           { name: 'Raj Patel', room: '101', time: '1h ago' },
+                          { name: 'Siddharth Rao', room: '402', time: '2h ago' },
+                          { name: 'Neha Iyer', room: '215', time: '5h ago' },
                         ].map(g => (
                           <div key={g.name} className="lp-mini-row">
                             <div className="lp-mini-avatar">{g.name[0]}</div>
@@ -1158,9 +1150,12 @@ export default function LandingPage() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           {[
-                            { guest: 'Aarav Sharma', room: '204', rate: '$120', status: 'Confirmed' },
-                            { guest: 'Priya Mehta', room: '310', rate: '$150', status: 'Active' },
-                            { guest: 'Kabir Sen', room: '105', rate: '$95', status: 'Pending' },
+                            { guest: 'Aarav Sharma', room: '204', rate: '₹9,600', status: 'Confirmed' },
+                            { guest: 'Priya Mehta', room: '310', rate: '₹12,000', status: 'Active' },
+                            { guest: 'Kabir Sen', room: '105', rate: '₹7,600', status: 'Pending' },
+                            { guest: 'Siddharth Rao', room: '402', rate: '₹14,400', status: 'Confirmed' },
+                            { guest: 'Neha Iyer', room: '215', rate: '₹8,800', status: 'Active' },
+                            { guest: 'Aditya Verma', room: '303', rate: '₹10,800', status: 'Pending' },
                           ].map((b, i) => (
                             <div key={i} style={{
                               display: 'flex',
@@ -1193,9 +1188,11 @@ export default function LandingPage() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           {[
-                            { name: 'Felix Carter', role: 'Owner', weight: '50', color: 'blue' },
-                            { name: 'Elena Rostova', role: 'Manager', weight: '30', color: 'amber' },
+                            { name: 'Amit Sharma', role: 'Owner', weight: '50', color: 'blue' },
+                            { name: 'Neha Patel', role: 'Manager', weight: '30', color: 'amber' },
                             { name: 'Rohan Das', role: 'Staff', weight: '10', color: 'green' },
+                            { name: 'Vikram Malhotra', role: 'Staff', weight: '10', color: 'green' },
+                            { name: 'Sandeep Reddy', role: 'Staff', weight: '10', color: 'green' },
                           ].map((emp, i) => (
                             <div key={i} style={{
                               display: 'flex',
@@ -1228,10 +1225,11 @@ export default function LandingPage() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           {[
-                            { action: 'Staff check-in Aarav Sharma', time: '2m ago', icon: '🔑' },
-                            { action: 'Staff checkout Sarah Jenkins', time: '15m ago', icon: '🚪' },
-                            { action: 'Manager override rate Room 310', time: '1h ago', icon: '💰' },
-                            { action: 'Admin updated settings', time: '4h ago', icon: '⚙️' },
+                            { action: 'Vikram Malhotra check-in Aarav Sharma', time: '2m ago', icon: '🔑' },
+                            { action: 'Sandeep Reddy checkout Neha Iyer', time: '15m ago', icon: '🚪' },
+                            { action: 'Neha Patel override rate Room 310', time: '1h ago', icon: '💰' },
+                            { action: 'Amit Sharma updated settings', time: '4h ago', icon: '⚙️' },
+                            { action: 'Rohan Das allocated Room 201', time: '6h ago', icon: '🛌' },
                           ].map((log, i) => (
                             <div key={i} style={{
                               display: 'flex',
@@ -1275,21 +1273,19 @@ export default function LandingPage() {
             padding: '0 var(--sp-2xl)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--sp-md)',
-            height: '100%',
-            justifyContent: 'center'
+            gap: '8px',
           }}
         >
-          <div style={{ textAlign: 'center', marginBottom: 'var(--sp-xs)' }}>
-            <h2 style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '0px' }}>
+            <h2 style={{ fontSize: 'var(--fs-md)', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '2px' }}>
               Guest Check-In Flow
             </h2>
-            <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: 'var(--sp-xs) 0 0 0' }}>
+            <p style={{ fontSize: '11px', color: 'var(--text-mute)', margin: '0' }}>
               From Arrival to Allocated Room in 4 Steps
             </p>
           </div>
 
-        <div className="lp-flow-grid">
+        <div className="lp-flow-grid" style={{ marginTop: '8px' }}>
           {[
             {
               num: '01',
@@ -1330,17 +1326,17 @@ export default function LandingPage() {
         </div>
 
         {/* Access Control segment */}
-        <div style={{ marginTop: 'var(--sp-xs)' }}>
-          <div style={{ textAlign: 'center', marginBottom: 'var(--sp-xs)' }}>
-            <h2 style={{ fontSize: 'var(--fs-lg)', fontWeight: 900, letterSpacing: '-0.5px' }}>
+        <div style={{ marginTop: '12px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '0px' }}>
+            <h2 style={{ fontSize: 'var(--fs-md)', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '2px' }}>
               Access Control
             </h2>
-            <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: 'var(--sp-xs) 0 0 0' }}>
+            <p style={{ fontSize: '11px', color: 'var(--text-mute)', margin: '0' }}>
               The Right Access for the Right Person
             </p>
           </div>
 
-          <div className="lp-roles-grid">
+          <div className="lp-roles-grid" style={{ marginTop: '8px' }}>
           {[
             {
               role: 'Hotel Owner',
@@ -1585,28 +1581,6 @@ export default function LandingPage() {
             </div>
           </div>
         </TiltCard>
-
-        {/* Footer */}
-        <footer
-          style={{
-            borderTop: '1px solid var(--border)',
-            width: '100%',
-            textAlign: 'center',
-            padding: 'var(--sp-md) var(--sp-lg)',
-            marginTop: 'var(--sp-lg)',
-            zIndex: 10,
-          }}
-        >
-          <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: 0 }}>
-            © {new Date().getFullYear()} SyncZen Cloud. All rights reserved.
-          </p>
-          <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-mute)', margin: '4px 0 0 0' }}>
-            Author: <strong>Felix-au</strong> (Harshit Soni)
-          </p>
-          <p style={{ textAlign: 'center', marginTop: 'var(--sp-sm)' }}>
-            <sub>Built for hoteliers who value visual aesthetics and operational speed.</sub>
-          </p>
-        </footer>
         </motion.div>
       </section>
     </div>
