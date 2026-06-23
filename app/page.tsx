@@ -93,7 +93,7 @@ const roleCardVariants = {
   hidden: { opacity: 0, rotateY: 0 },
   visible: {
     opacity: [0, 1, 1, 1],
-    rotateY: [0, 45, 45, 0],
+    rotateY: [0, 30, 30, 0],
     transition: {
       duration: 1.5,
       times: [0, 0.25, 0.75, 1.0],
